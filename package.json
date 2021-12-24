@@ -1,0 +1,20 @@
+{
+  "name": "thereciperack",
+  "version": "1.0.0",
+  "description": "[![GitHub Stars](https://img.shields.io/github/stars/DeathlyBower959/thereciperack.svg)](https://github.com/DeathlyBower959/thereciperack/stargazers) [![GitHub Issues](https://img.shields.io/github/issues/DeathlyBower959/thereciperack.svg)](https://github.com/DeathlyBower959/thereciperack/issues) [![Live Demo](https://img.shields.io/badge/demo-online-green.svg)](https://thereciperack.ml)",
+  "main": "index.js",
+  "scripts": {
+    "installAll": "npm install --prefix client && npm install --prefix server"
+    },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DeathlyBower959/thereciperack.git"
+  },
+  "keywords": [],
+  "author": "DeathlyBower959",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DeathlyBower959/thereciperack/issues"
+  },
+  "homepage": "https://github.com/DeathlyBower959/thereciperack#readme"
+}
