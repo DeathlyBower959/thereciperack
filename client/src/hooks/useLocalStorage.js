@@ -15,7 +15,7 @@ export default function useLocalStorage(key, initialValue) {
   })
 
   useEffect(() => {
-    console.log(`Saving ${prefixedKey} as data:\n${JSON.stringify(value)}`)
+    // console.log(`Saving ${prefixedKey} as data:\n${JSON.stringify(value)}`)
     localStorage.setItem(prefixedKey, JSON.stringify(value))
   }, [prefixedKey, value])
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-const useForm = (callback, validate, defaultValues = {}) => {
+const useForm = (callback, validate, defaultValues = {}, customFunctions = {}) => {
     const [values, setValues] = useState(defaultValues)
     const [errors, setErrors] = useState({})
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -12,6 +12,8 @@ const useForm = (callback, validate, defaultValues = {}) => {
     }, [errors])
 
     const handleSubmit = (event) => {
+        if (customFunctions.handleSubmit) return customFunctions.handleSubmit(event)
+
         event?.preventDefault()
 
         setErrors(() => {
@@ -24,7 +26,10 @@ const useForm = (callback, validate, defaultValues = {}) => {
     }
 
     const handleChange = (event) => {
-        event.persist()
+        if (customFunctions.handleChange) return customFunctions.handleChange(event)
+
+
+        event?.persist()
         setErrors((prev) => {
             return { ...prev, [event.target.name]: null }
         })
@@ -35,6 +40,8 @@ const useForm = (callback, validate, defaultValues = {}) => {
     }
 
     const addError = (name, message) => {
+        if (customFunctions.addError) return customFunctions.addError(name, message)
+
         setErrors((prev) => {
             return { ...prev, [name]: message }
         })
@@ -43,6 +50,9 @@ const useForm = (callback, validate, defaultValues = {}) => {
     return {
         addError,
         handleChange,
+        setErrors, 
+        setValues,
+        setIsSubmitting,
         handleSubmit,
         values,
         errors,

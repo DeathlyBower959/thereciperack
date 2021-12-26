@@ -62,13 +62,13 @@ export const editSettings = async (userID, newSettingData) => {
 export const createTheme = async (userID, newTheme) => {
     if (!userID) return console.error('Missing userID')
     if (!newTheme) return console.error('Missing newTheme')
-
+    
     try {
         const res = await Axios.post(settings.SERVER_URL + '/settings/theme', {
             userID,
             newTheme,
         })
-
+        
         return res
     } catch (error) {
         if (error.response) {

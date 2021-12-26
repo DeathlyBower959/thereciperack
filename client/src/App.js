@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
-import { Route, Routes } from 'react-router-dom'
+import { Route, Routes as ReactRoutes } from 'react-router-dom'
+
 
 import { shopping, users, recipe, cookbook } from './api/api'
 
 import styled, { ThemeProvider } from 'styled-components'
 import { themes } from './themes.json'
 
-import AuthRoute from './components/AuthRoute'
-import NoAuthRoute from './components/NoAuthRoute'
+import Routes from './components/Routes/Routes'
 
 import Navbar from './components/Navigation/Navbar'
 import PageNotFound from './pages/PageNotFound/PageNotFound'
@@ -27,10 +27,11 @@ import Account from './pages/Account/Account'
 
 import defaultThemes from './themes.json'
 
-import Axios from 'axios'
 import settings from './settings'
 import Cookbooks from './pages/Cookbooks/Cookbooks'
 import CreateCookbook from './pages/CreateCookbook/CreateCookbook'
+
+import { IoConstructSharp } from 'react-icons/io5'
 
 const AppContainer = styled.div`
     height: 100%;
@@ -57,34 +58,35 @@ const App = () => {
     })
 
     const AuthLogin = async (email, password) => {
-        const loginPromise = new Promise(async (resolve, reject) => {
-            if (!email || !password) {
-                console.error('No email or password')
-                if (userData == 'none') setUserData(null)
-                reject()
-            }
+        const LoginPromise = () => {
+            return new Promise(async (resolve, reject) => {
+                const retrievedUser = await users.getUser(email, password)
 
-            const retrievedUser = await users.getUser(email, password)
+                if (!retrievedUser || retrievedUser?.status != 200) {
+                    if (userData == 'none') setUserData(null)
+                    return reject('User not found')
+                }
 
-            if (!retrievedUser || retrievedUser?.status != 200) {
-                if (userData == 'none') setUserData(null)
-                reject()
-            }
+                setLocalAuth({ email, password })
+                setUserData(retrievedUser.data)
+                resolve(retrievedUser.data)
+            })
+        }
 
-            setLocalAuth({ email, password })
-            setUserData(retrievedUser.data)
-            resolve(retrievedUser.data)
-        })
-
-        SendToast(
-            {
-                promise: loginPromise,
-                pending: 'Logging you in...',
-                error: 'Failed to login!',
-                success: 'Successfully logged in!',
-            },
-            'promise'
-        )
+        if (email && password) {
+            SendToast(
+                {
+                    promise: LoginPromise,
+                    pending: 'Logging you in...',
+                    error: 'Failed to login!',
+                    success: 'Successfully logged in!',
+                },
+                'promise'
+            )
+        } else {
+            console.error('No email or password')
+            if (userData == 'none') setUserData(null)
+        }
     }
 
     const AuthLogout = () => {
@@ -109,7 +111,12 @@ const App = () => {
 
     useEffect(() => {
         if (settings.activeDevelopment)
-            SendToast('This app is still in development!', 'info')
+            SendToast(
+                `This app is still in development!`,
+                '',
+                theme,
+                IoConstructSharp
+            )
 
         AuthLogin(localAuth?.email, localAuth?.password)
 
@@ -128,12 +135,18 @@ const App = () => {
         window.addEventListener('resize', onWindowResize.bind(this))
     }, [])
 
-    const SendToast = async (message, type, currentTheme = theme) => {
+    const SendToast = async (
+        message,
+        type,
+        currentTheme = theme,
+        icon = null
+    ) => {
         if (!message) return console.error('Failed to send toast, no message!')
         switch (type) {
             case 'success':
                 toast.success(message, {
                     position: toast.POSITION.BOTTOM_RIGHT,
+                    icon,
                     style: {
                         backgroundColor: currentTheme.secondaryBackground,
                         color: currentTheme.foreground,
@@ -148,6 +161,7 @@ const App = () => {
             case 'info':
                 toast.info(message, {
                     position: toast.POSITION.BOTTOM_RIGHT,
+                    icon,
                     style: {
                         backgroundColor: currentTheme.secondaryBackground,
                         color: currentTheme.foreground,
@@ -160,6 +174,7 @@ const App = () => {
             case 'warn':
                 toast.warn(message, {
                     position: toast.POSITION.BOTTOM_RIGHT,
+                    icon,
                     style: {
                         backgroundColor: currentTheme.secondaryBackground,
                         color: currentTheme.foreground,
@@ -172,6 +187,7 @@ const App = () => {
             case 'error':
                 toast.error(message, {
                     position: toast.POSITION.BOTTOM_RIGHT,
+                    icon,
                     style: {
                         backgroundColor: currentTheme.secondaryBackground,
                         color: currentTheme.foreground,
@@ -184,12 +200,14 @@ const App = () => {
             case 'promise':
                 if (!message.promise)
                     return console.log('Error sending notification!')
+
                 const response = await toast.promise(message.promise, {
                     pending: {
                         render() {
                             return message.pending || 'Working on it...'
                         },
                         position: toast.POSITION.BOTTOM_RIGHT,
+                        icon,
                         style: {
                             backgroundColor: currentTheme.secondaryBackground,
                             color: currentTheme.foreground,
@@ -203,6 +221,7 @@ const App = () => {
                             return message.success || 'All done!'
                         },
                         position: toast.POSITION.BOTTOM_RIGHT,
+                        icon,
                         style: {
                             backgroundColor: currentTheme.secondaryBackground,
                             color: currentTheme.foreground,
@@ -218,6 +237,7 @@ const App = () => {
                             )
                         },
                         position: toast.POSITION.BOTTOM_RIGHT,
+                        icon,
                         style: {
                             backgroundColor: currentTheme.secondaryBackground,
                             color: currentTheme.foreground,
@@ -227,9 +247,12 @@ const App = () => {
                         },
                     },
                 })
+
+                return response
             default:
                 toast(message, {
                     position: toast.POSITION.BOTTOM_RIGHT,
+                    icon,
                     style: {
                         backgroundColor: currentTheme.secondaryBackground,
                         color: currentTheme.foreground,
@@ -259,7 +282,7 @@ const App = () => {
                         <IsCrushed.Provider value={isCrushed}>
                             <Background />
                             <Navbar />
-                            <Routes>
+                            <ReactRoutes>
                                 {/* Page not found */}
                                 <Route path='*' element={<PageNotFound />} />
 
@@ -270,7 +293,7 @@ const App = () => {
                                 <Route path='/about' element={<About />} />
 
                                 {/* No Account */}
-                                <Route element={<NoAuthRoute />}>
+                                <Route element={<Routes.Public />}>
                                     <Route
                                         path='/signup'
                                         element={<SignupLogin login={false} />}
@@ -283,7 +306,7 @@ const App = () => {
                                 </Route>
 
                                 {/* Requires Account/Signed in */}
-                                <Route element={<AuthRoute />}>
+                                <Route element={<Routes.Private />}>
                                     {/* Manage Account */}
                                     <Route
                                         path='/account'
@@ -336,7 +359,7 @@ const App = () => {
                                         element={<PageNotFound />}
                                     />
                                 </Route>
-                            </Routes>
+                            </ReactRoutes>
                         </IsCrushed.Provider>
                     </ThemeProvider>
                 </AccountContext.Provider>

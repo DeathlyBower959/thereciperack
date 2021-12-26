@@ -8,23 +8,19 @@ import {
     Nav,
     NavDropdown,
     Spinner,
-    SplitButton,
-    Dropdown,
-    ButtonGroup,
 } from 'react-bootstrap'
 import IsCrushedContext from '../../contexts/IsCrushedContext'
 
-import NavLink from './NavLink'
+import NavBarComponents from './Navbar.js'
 import AccountContext from '../../contexts/AccountContext'
-import NavButton from './NavButton'
 
 import Logo from '../../assets/logo.svg'
 
 const DropdownItem = styled(NavDropdown.Item)`
     display: block;
     width: 100%;
-    padding: 0.25rem 1rem;
-    color: ${(props) => props.theme.faded};
+    padding: 0.5rem 1rem;
+    color: ${(props) => props.theme.muted};
     clear: both;
     font-weight: 400;
     text-align: inherit;
@@ -124,19 +120,19 @@ const NavigationBar = () => {
                             </DropdownItem>
                             <NavDropdown.Divider />
                         </NavigationDropdown> */}
-                        <NavLink title='My Cookbooks' path='/cookbooks' />
-                        <NavLink title='About' path='/about' />
+                        <NavBarComponents.Link title='My Cookbooks' path='/cookbooks' />
+                        <NavBarComponents.Link title='About' path='/about' />
                     </Nav>
                     <Nav>
                         {isCrushed && <NavDropdown.Divider />}
 
                         {userData == null || userData == undefined ? (
                             <>
-                                <NavLink title='Sign up' path='/signup' style={{marginRight: '8px'}}/>
+                                <NavBarComponents.Link title='Sign up' path='/signup' style={{marginRight: '8px'}}/>
                                 {isCrushed ? (
-                                    <NavLink title='Login' path='/login' />
+                                    <NavBarComponents.Link title='Login' path='/login' />
                                 ) : (
-                                    <NavButton title='Login' path='/login' />
+                                    <NavBarComponents.Button title='Login' path='/login' />
                                 )}
                             </>
                         ) : userData == 'none' ? (

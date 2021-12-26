@@ -4,7 +4,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 export const send = async (to, subject, html) => {
-    return console.error('Not implemented just yet')
+    // return console.error('Not implemented just yet')
     var transport = nodemailer.createTransport({
         host: 'smtp.gmail.com',
         port: 587,

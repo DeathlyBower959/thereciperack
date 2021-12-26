@@ -1,8 +1,8 @@
 import React, { useContext } from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router'
-import AccountContext from '../contexts/AccountContext'
+import AccountContext from '../../contexts/AccountContext'
 
-const NoAuthRoute = () => {
+const Public = () => {
     const { userData } = useContext(AccountContext)
 
     return userData == null || userData == undefined ? (
@@ -13,4 +13,4 @@ const NoAuthRoute = () => {
     )
 }
 
-export default NoAuthRoute
+export default Public

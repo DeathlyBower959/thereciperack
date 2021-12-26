@@ -3,15 +3,11 @@ import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 import IsCrushedContext from '../../contexts/IsCrushedContext'
 import AccountContext from '../../contexts/AccountContext'
+import Pages from '../../components/Pages/Pages'
+import { Form } from 'react-bootstrap'
 
-const DivBody = styled.div`
-    display: flex;
+const DivBody = styled(Pages.PageBody)`
     width: 80%;
-    flex-direction: column;
-    margin: 50px auto;
-    background-color: ${(props) => props.theme.secondaryBackground};
-    position: relative;
-    overflow: hidden;
 `
 
 const SearchBox = styled.input`
@@ -22,9 +18,9 @@ const SearchBox = styled.input`
     font-weight: 400;
     line-height: 1.5;
     color: ${(props) => props.theme.foreground};
-    background-color: ${(props) => props.theme.textboxBackground};
+    background-color: ${(props) => props.theme.inputBackground};
     appearance: none;
-    border-radius: 0.25rem;
+    border-radius: 0.5rem;
 
     ::placeholder {
         color: ${(props) => props.theme.muted};
@@ -41,35 +37,11 @@ const TagSelect = styled.select`
     font-weight: 400;
     line-height: 1.5;
     color: ${(props) => props.theme.muted};
-    background-color: ${(props) => props.theme.textboxBackground};
-    border-radius: 0.25rem;
+    background-color: ${(props) => props.theme.inputBackground};
+    border-radius: 0.5rem;
 
     border-width: 0;
     outline: 0;
-`
-
-const NewButton = styled.button`
-    padding: 8px 25px;
-    color: ${(props) => props.theme.foreground};
-    font-size: 15px;
-    font-weight: 600;
-    border: none;
-    border-radius: 100px 100px 100px 100px;
-    cursor: pointer;
-    transition: filter 240ms ease-in-out;
-    background: ${(props) => props.theme.accent};
-    background: linear-gradient(
-        58deg,
-        ${(props) => props.theme.accent} 20%,
-        ${(props) => props.theme.secondaryAccent} 100%
-    );
-    &:hover {
-        filter: brightness(0.9);
-    }
-
-    &:disabled {
-        filter: brightness(0.4);
-    }
 `
 
 const SearchBar = ({ tagOptions }) => {
@@ -111,12 +83,12 @@ const SearchBar = ({ tagOptions }) => {
                     </TagSelect>
                 )}
                 <Link to='/create'>
-                    <NewButton
+                    <Form.Button
                         style={{ marginLeft: '10px' }}
                         disabled={userData == null || userData == undefined}
                     >
                         New
-                    </NewButton>
+                    </Form.Button>
                 </Link>
             </div>
             {!isCrushed ? (

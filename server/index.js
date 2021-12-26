@@ -11,10 +11,12 @@ import recipeRoutes from './routes/recipe.js'
 import shoppingRoute from './routes/shopping.js'
 import settingRoute from './routes/settings.js'
 import emailRoute from './routes/email.js'
+import bodyParser from 'body-parser'
 
 // Express App Setup
 const app = express()
-app.use(express.json())
+app.use(express.json({ limit: '25mb' }))
+app.use(bodyParser.urlencoded({ limit: '25mb', extended: true }))
 app.use(cors())
 
 // Routes

@@ -35,10 +35,15 @@ const CardTitle = styled.h5`
 `
 
 const CardDescription = styled.p`
-    margin-top: 5px;
     margin-left: 10px;
+    margin-top: 5px;
 
     color: ${(props) => props.theme.foreground};
+`
+
+const CardTags = styled.p`
+    margin: 2px auto 0px 18px;
+    color: ${(props) => props.theme.muted};
 `
 
 const StyledSpinner = styled(Spinner)`
@@ -51,8 +56,11 @@ const CookbookCard = ({ cookbook, deleteCookbook }) => {
         name = 'No Name',
         coverImage,
         description = 'No Description',
+        tags,
         id,
     } = cookbook
+
+    const theme = useContext(ThemeContext)
 
     const [loading, setLoading] = useState(true)
 
@@ -65,7 +73,10 @@ const CookbookCard = ({ cookbook, deleteCookbook }) => {
                     <Link to={`/cookbook/${id}`}>
                         <img
                             src={coverImage ?? defaultImage}
-                            style={{ borderRadius: '10px', display: (loading ? 'none' : 'block') }}
+                            style={{
+                                borderRadius: '10px',
+                                display: loading ? 'none' : 'block',
+                            }}
                             className='card-img-top h-100'
                             alt='Not found... :('
                             onLoad={() => setLoading(false)}
@@ -86,7 +97,16 @@ const CookbookCard = ({ cookbook, deleteCookbook }) => {
                         >
                             <CardTitle className='card-title'>{name}</CardTitle>
                         </Link>
-                        <hr style={{ margin: '10px auto 10px 10px' }} />
+                        <CardTags className='card-text'>
+                            {tags.join(', ').trim().slice(0, -1)}
+                        </CardTags>
+                        <hr
+                            style={{
+                                margin: '10px auto 10px 10px',
+                                filter: 'blur(1px)',
+                                color: theme.foreground,
+                            }}
+                        />
                         <CardDescription className='card-text'>
                             {description}
                         </CardDescription>

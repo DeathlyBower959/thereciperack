@@ -29,6 +29,7 @@ export const getSettings = async (req, res) => {
 export const createTheme = async (req, res) => {
     const userData = req.body
 
+
     if (!userData.userID || !userData.newTheme || !userData.newTheme.themeID) {
         let missing = []
         if (!userData.userID) missing.push('userID')
@@ -64,9 +65,11 @@ export const createTheme = async (req, res) => {
                 message: 'Theme with that id already exists',
             })
 
-        user.settings.themes.push(userData.newTheme.themeID)
+        user.settings.themes.push(userData.newTheme)
         user.settings.selectedTheme = userData.newTheme.themeID
         const newUser = await user.save()
+        
+
 
         res.status(201).json(newUser)
     } catch (error) {

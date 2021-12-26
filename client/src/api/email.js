@@ -1,6 +1,8 @@
 import Axios from 'axios'
 import settings from '../settings.js'
 
+
+
 export const sendEmail = async (to, subject, html) => {
     if (!to) return console.error('Missing to')
     if (!subject) return console.error('Missing subject')
@@ -34,3 +36,4 @@ export const sendEmail = async (to, subject, html) => {
         }
     }
 }
+

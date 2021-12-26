@@ -21,9 +21,10 @@ const defaultThemes = [
         background: '#282828',
         secondaryBackground: '#323232',
         thirdBackground: '#3c3c3c',
-        textboxBackground: '#444444',
+        inputBackground: '#444444',
         muted: '#a0a0a0',
-        faded: '#949494',
+        disabledText: "#545454",
+
         error: '#ff5252',
     },
     {
@@ -45,9 +46,10 @@ const defaultThemes = [
         background: '#fafafa',
         secondaryBackground: '#e6e6e6',
         thirdBackground: '#d2d2d2',
-        textboxBackground: '#bebebe',
+        inputBackground: '#bebebe',
         muted: '#545454',
-        faded: '#595959',
+        disabledText: "#a1a1a1",
+
         error: '#ff3333',
     },
 ]
@@ -59,14 +61,18 @@ const userSchema = mongoose.Schema({
     name: {
         type: String,
         required: true,
+        trim: true,
     },
     email: {
         type: String,
         required: true,
+        trim: true,
+        lowercase: true
     },
     password: {
         type: String,
         required: true,
+        trim: true
     },
 
     settings: {
@@ -77,11 +83,13 @@ const userSchema = mongoose.Schema({
                         themeID: {
                             type: String,
                             required: true,
+                            trim: true
                         },
                         name: {
                             type: String,
                             required: true,
                             default: 'No Name',
+                            trim: true
                         },
 
                         navbar: {
@@ -90,6 +98,30 @@ const userSchema = mongoose.Schema({
                                     type: String,
                                     required: true,
                                     default: defaultThemes[0].navbar.background,
+                                },
+                            },
+                            required: true,
+                            default: {
+                                background: defaultThemes[0].navbar.background,
+                            },
+                        },
+
+                        alert: {
+                            type: {
+                                color: {
+                                    type: String,
+                                    required: true,
+                                    default: defaultThemes[0].alert.color,
+                                },
+                                background: {
+                                    type: String,
+                                    required: true,
+                                    default: defaultThemes[0].alert.background,
+                                },
+                                border: {
+                                    type: String,
+                                    required: true,
+                                    default: defaultThemes[0].alert.border,
                                 },
                             },
                             required: true,
@@ -130,10 +162,15 @@ const userSchema = mongoose.Schema({
                             required: true,
                             default: defaultThemes[0].secondaryBackground,
                         },
-                        textboxBackground: {
+                        thirdBackground: {
                             type: String,
                             required: true,
-                            default: defaultThemes[0].textboxBackground,
+                            default: defaultThemes[0].thirdBackground,
+                        },
+                        inputBackground: {
+                            type: String,
+                            required: true,
+                            default: defaultThemes[0].inputBackground,
                         },
 
                         muted: {
@@ -141,10 +178,10 @@ const userSchema = mongoose.Schema({
                             required: true,
                             default: defaultThemes[0].muted,
                         },
-                        faded: {
+                        disabledText: {
                             type: String,
                             required: true,
-                            default: defaultThemes[0].faded,
+                            default: defaultThemes[0].disabledText,
                         },
                         error: {
                             type: String,
@@ -181,8 +218,18 @@ const userSchema = mongoose.Schema({
                     type: String,
                     required: true,
                     default: 'New Recipe',
+                    trim: true
+                },
+                description: {
+                    type: String,
+                    trim: true
                 },
                 coverImage: String,
+                tags: {
+                    type: [String],
+                    required: true,
+                    default: []
+                },
                 recipes: {
                     type: [
                         {
@@ -194,10 +241,12 @@ const userSchema = mongoose.Schema({
                             name: {
                                 type: String,
                                 required: true,
+                                trim: true
                             },
                             description: {
                                 type: String,
                                 required: true,
+                                trim: true
                             },
                             image: String,
                             tags: [String],
@@ -212,30 +261,34 @@ const userSchema = mongoose.Schema({
                                         name: {
                                             type: String,
                                             required: true,
+                                            trim: true
                                         },
                                         amount: {
                                             type: String,
                                             required: true,
+                                            trim: true
                                         },
                                         unit: {
                                             type: String,
                                             required: true,
+                                            trim: true
                                         },
                                     },
                                 ],
                                 required: true,
                             },
                             steps: {
-                                id: {
-                                    type: String,
-                                    required: true,
-                                    default: uuidv4(),
-                                },
                                 type: [
                                     {
+                                        id: {
+                                            type: String,
+                                            required: true,
+                                            default: uuidv4(),
+                                        },
                                         description: {
                                             type: String,
                                             required: true,
+                                            trim: true
                                         },
                                     },
                                 ],
@@ -244,6 +297,7 @@ const userSchema = mongoose.Schema({
                             servSize: {
                                 type: String,
                                 required: true,
+                                trim: true
                             },
                             prep: {
                                 type: Object,
@@ -265,9 +319,9 @@ const userSchema = mongoose.Schema({
         type: [
             {
                 id: { type: String, required: true, default: uuidv4() },
-                amount: { type: String, required: true },
-                unit: { type: String, required: true },
-                name: { type: String, required: true },
+                name: { type: String, required: true, trim: true },
+                amount: { type: String, required: true, trim: true },
+                unit: { type: String, required: true, trim: true },
             },
         ],
         default: [],

@@ -1,6 +1,6 @@
 import User from '../models/userModel.js'
 import jwt from 'jsonwebtoken'
-import { send, sendEmail } from './email.js'
+import { send } from './email.js'
 
 export const getUser = async (req, res) => {
     const userData = req.query
@@ -119,7 +119,7 @@ export const createUser = async (req, res) => {
                   Please verify your email address to unlock more features!
                 </p>
         
-                <a href="http://localhost:5000/users/authenticate/?token=${token}" target="_blank">
+                <a href="http://localhost:5000/users/authenticate/?token=${token}" target="_blank" >
                   <button
                     style="
                       width: 45%;
@@ -168,7 +168,7 @@ export const authenticateUser = async (req, res) => {
 
     try {
         const decoded = jwt.verify(userData.token, process.env.JWT_TOKEN)
-
+        
         const foundUser = await User.findOne({ id: decoded.id })
 
         if (!foundUser) {
@@ -197,7 +197,119 @@ export const authenticateUser = async (req, res) => {
         </html>
         `)
     } catch (err) {
-        return res.status(401).send('Invalid Token')
+        if (err.message == 'jwt expired') res.status(401).send('Token expired')
+        else res.status(401).send('Invalid Token')
+    }
+}
+export const regenJWTToken = async (req, res) => {
+    const userData = req.query
+
+    if (!userData.userID) {
+        let missing = []
+        if (!userData.userID) missing.push('userID')
+
+        return res.status(400).json({
+            message: 'Missing userID/email',
+            missing,
+            data: userData,
+        })
+    }
+
+
+    try {
+        const foundUser = await User.findOne({ id: userData.userID })
+
+        if (!foundUser) {
+            return res.status(404).json({
+                message: 'User not found',
+                data: userData,
+            })
+        }
+
+        if (foundUser.token == null) {
+            return res.status(404).json({
+                message: 'User already authenticated',
+                data: userData,
+            })
+        }
+
+        const token = jwt.sign(
+            { id: foundUser.id, email: foundUser.email.toLowerCase() },
+            process.env.JWT_TOKEN,
+            {
+                expiresIn: '10m',
+            }
+        )
+
+        foundUser.token = token;
+        
+        foundUser.save()
+        
+        send(
+            foundUser.email,
+            'Verification Email',
+            `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                    <meta charset="UTF-8" />
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+                    <title>Static Template</title>
+                    <link
+                    href="https://fonts.googleapis.com/css?family=Muli&amp;display=swap"
+                    rel="stylesheet"
+                    />
+                </head>
+                <body>
+                <div
+                    style="
+                        margin: auto;
+                        width: 400px;
+                        background-color: #f6f6f6;
+                        padding: 10px;
+                        font-family: 'Muli', sans-serif;
+                    "
+                    >
+                    <div
+                        style="
+                        margin: 15px;
+                        padding: 10px;
+                        background-color: #fff;
+                        text-align: center;
+                        "
+                    >
+                        <h2>Thanks for signing up,<br />${foundUser.name}!</h2>
+                
+                        <p style="padding-left: 25px; padding-right: 25px;">
+                        Please verify your email address to unlock more features!
+                        </p>
+                        
+                        <a href="http://localhost:5000/users/authenticate/?token=${foundUser.token}" target="_blank" >
+                        <button
+                            style="
+                            width: 45%;
+                            padding: 10px 20px 10px 20px;
+                            background-color: #a74ef6;
+                            
+                            border-radius: 20px;
+                            outline: 0;
+                            border: 0;
+                            cursor: pointer;
+                            margin-bottom: 10px;
+                            "
+                            >
+                            Verify Email Now
+                            </button>
+                        </a>
+                    </div>
+                    </div>
+                    </body>
+                </html>`
+        )
+
+    } catch (err) {
+        res.status(401).send('Failed to regenerate token')
     }
 }
 

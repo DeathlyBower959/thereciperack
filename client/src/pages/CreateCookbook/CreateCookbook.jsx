@@ -1,24 +1,20 @@
-import React, { useContext, useState } from 'react'
-import { Form, Container, Row, Col } from 'react-bootstrap'
+import React, { useContext, useRef } from 'react'
+import { Form as FormWrapper, Container, Row, Col } from 'react-bootstrap'
 import styled from 'styled-components'
 import { cookbook } from '../../api/api'
 import Account from '../../contexts/AccountContext'
 import IsCrushed from '../../contexts/IsCrushedContext'
+import ToastNotif from '../../contexts/ToastNotifContext'
 import useForm from '../../hooks/useForm'
 import validate from './CreateValidation'
+import { useNavigate } from 'react-router'
+import { byteSize } from '../../utils/image'
+import Pages from '../../components/Pages/Pages'
+import Form from '../../components/Forms/Form'
 
-const DivBody = styled.div`
+const DivBody = styled(Pages.PageBody)`
     text-align: center;
-    width: 80%;
     padding-bottom: 40px;
-    border-radius: 19px;
-    margin: 50px auto;
-    background-color: ${(props) => props.theme.secondaryBackground};
-    -webkit-box-shadow: 0 0 2px rgba(15, 15, 15, 0.58);
-    box-shadow: 0 0 2px rgba(15, 15, 15, 0.58);
-    position: relative;
-    overflow: hidden;
-
 `
 
 const ErrorMessage = styled.p`
@@ -26,35 +22,11 @@ const ErrorMessage = styled.p`
     margin-top: 3px;
     color: ${(props) => props.theme.error};
     font-size: 14px;
-
-`
-
-const Input = styled.input`
-    width: 50%;
-    height: 42px;
-    outline: none;
-    color: ${(props) => props.theme.foreground};
-    border: 1px solid ${(props) => props.theme.secondaryBackground}08;
-    caret-color: ${(props) => props.theme.muted};
-    padding: 0px 10px;
-    border-bottom: 1.4px solid transparent;
-    transition: border 200ms ease;
-    font-size: 12px;
-    &::placeholder {
-        color: ${(props) => props.theme.muted};
-    }
-    &:not(:last-of-type) {
-        border-bottom: 1.5px solid rgba(200, 200, 200, 0.4);
-    }
-    &:focus {
-        outline: none;
-        border-bottom: 3px solid ${(props) => props.theme.accent};
-    }
-    background-color: ${(props) => props.theme.textboxBackground};
 `
 
 const TextArea = styled.textarea`
     width: 60%;
+    border-radius: 8px;
     resize: none;
     min-height: 42px;
     height: 60px;
@@ -77,7 +49,7 @@ const TextArea = styled.textarea`
         outline: none;
         border-bottom: 3px solid ${(props) => props.theme.accent};
     }
-    background-color: ${(props) => props.theme.textboxBackground};
+    background-color: ${(props) => props.theme.inputBackground};
 `
 
 const CookbookName = styled.h1`
@@ -92,29 +64,101 @@ const FormRow = styled(Row)`
 `
 
 const CreateCookbook = () => {
-    const Create = () => {}
-    const { userData } = useContext(Account)
-    const [newData, setNewData] = useState({})
-    const { values, errors, handleChange, handleSubmit } = useForm(
+    const Create = async () => {
+        const res = await cookbook.createCookbook(userData.id, {
+            ...values,
+            tags: values?.tags?.split(',')?.map((item) => item?.trim()) || [],
+        })
+        if (res.status != 201) Toast('Failed to create cookbook...', 'error')
+        else {
+            setUserData(res.data)
+            Toast('Created cookbook!', 'success')
+            navigate(-1)
+        }
+    }
+
+    const navigate = useNavigate()
+
+    const Toast = useContext(ToastNotif)
+    const isCrushed = useContext(IsCrushed)
+    const { userData, setUserData } = useContext(Account)
+
+    const coverImageRef = useRef()
+
+    const {
+        values,
+        errors,
+        handleChange,
+        setErrors,
+        setValues,
+        setIsSubmitting,
+        handleSubmit,
+    } = useForm(
         Create,
-        validate
+        validate,
+        {},
+        {
+            handleChange: (e) => {
+                if (e?.persist) e.persist()
+
+                if (e.target.name == 'coverImage') {
+                    if (
+                        !['.png', '.jpg', '.jpeg', '.bmp', '.ico'].some((ex) =>
+                            e.target.files[0]?.name?.toLowerCase()?.endsWith(ex)
+                        )
+                    ) {
+                        e.target.value = ''
+                        setValues((values) => ({
+                            ...values,
+                            [e.target.name]: null,
+                        }))
+                        return
+                    }
+
+                    let reader = new FileReader()
+                    reader.onload = (e) => {
+                        // Files bigger than 10mb will show a warning
+                        if (byteSize(e.target.result, 'mb') >= 10) {
+                            Toast('File to large!', 'warn')
+                            e.target.value = ''
+                            return
+                        }
+                        setValues((values) => ({
+                            ...values,
+                            coverImage: e.target.result,
+                        }))
+                    }
+                    reader.readAsDataURL(e.target.files[0])
+                    return
+                }
+
+                setErrors((prev) => {
+                    return { ...prev, [e.target.name]: null }
+                })
+
+                setValues((values) => ({
+                    ...values,
+                    [e.target.name]: e.target.value,
+                }))
+            },
+        }
     )
 
     return (
         <DivBody>
-            <Container>
-                <Form
-                    style={{ width: '100%' }}
-                    onSubmit={handleSubmit}
-                    noValidate
-                >
+            <FormWrapper
+                style={{ width: '100%' }}
+                onSubmit={handleSubmit}
+                noValidate
+            >
+                <Container>
                     <Row>
                         <CookbookName>
                             {values.name || 'New Cookbook'}
                         </CookbookName>
                     </Row>
                     <FormRow>
-                        <Input
+                        <Form.Text
                             name='name'
                             onChange={handleChange}
                             value={values.name || ''}
@@ -126,48 +170,9 @@ const CreateCookbook = () => {
                         )}
                     </FormRow>
                     <FormRow>
-                        <TextArea
+                        <Form.TextArea
                             name='description'
-                            onChange={(e) => {
-                                handleChange(e)
-                                // Reset field height
-                                e.target.style.height = 'inherit'
-
-                                // Get the computed styles for the element
-                                const computed = window.getComputedStyle(
-                                    e.target
-                                )
-
-                                // Calculate the height
-                                const height =
-                                    parseInt(
-                                        computed.getPropertyValue(
-                                            'border-top-width'
-                                        ),
-                                        10
-                                    ) +
-                                    parseInt(
-                                        computed.getPropertyValue(
-                                            'padding-top'
-                                        ),
-                                        10
-                                    ) +
-                                    e.target.scrollHeight +
-                                    parseInt(
-                                        computed.getPropertyValue(
-                                            'padding-bottom'
-                                        ),
-                                        10
-                                    ) +
-                                    parseInt(
-                                        computed.getPropertyValue(
-                                            'border-bottom-width'
-                                        ),
-                                        10
-                                    )
-
-                                e.target.style.height = `${height}px`
-                            }}
+                            onChange={handleChange}
                             value={values.description || ''}
                             placeholder='Description'
                             required
@@ -176,18 +181,64 @@ const CreateCookbook = () => {
                             <ErrorMessage>{errors.description}</ErrorMessage>
                         )}
                     </FormRow>
-                    {/* <Input
-                    type='file'
-                    name='coverImage'
-                    onChange={handleChange}
-                    value={values.coverImage || ''}
-                    required
-                />
-                {errors.coverImage && (
-                    <ErrorMessage>{errors.coverImage}</ErrorMessage>
-                )} */}
-                </Form>
-            </Container>
+                    <FormRow
+                        style={{
+                            width: isCrushed ? '60%' : '50%',
+                            margin: '0 auto',
+                        }}
+                    >
+                        <Col>
+                            <Form.File
+                                inputRef={coverImageRef}
+                                label='Cover Image'
+                                name='coverImage'
+                                onChange={(e) => handleChange(e)}
+                            />
+                            {errors.coverImage && (
+                                <ErrorMessage>{errors.coverImage}</ErrorMessage>
+                            )}
+                        </Col>
+
+                        {!isCrushed && (
+                            <Col>
+                                <Form.Text
+                                    style={{ width: '100%' }}
+                                    name='tags'
+                                    onChange={handleChange}
+                                    value={values.tags || ''}
+                                    placeholder='Tags (separated by ",")'
+                                />
+                                {errors.tags && (
+                                    <ErrorMessage>{errors.tags}</ErrorMessage>
+                                )}
+                            </Col>
+                        )}
+                    </FormRow>
+                    {isCrushed && (
+                        <FormRow style={{ marginTop: '10px' }}>
+                            <Form.Text
+                                style={{ width: '60%' }}
+                                name='tags'
+                                onChange={handleChange}
+                                value={values.tags || ''}
+                                placeholder='Tags (separated by ",")'
+                            />
+                            {errors.tags && (
+                                <ErrorMessage>{errors.tags}</ErrorMessage>
+                            )}
+                        </FormRow>
+                    )}
+                    <br />
+                    <Form.Button>Create</Form.Button>
+                    <Form.Button
+                        type='button'
+                        muted
+                        onClick={() => navigate(-1)}
+                    >
+                        Cancel
+                    </Form.Button>
+                </Container>
+            </FormWrapper>
         </DivBody>
     )
 }

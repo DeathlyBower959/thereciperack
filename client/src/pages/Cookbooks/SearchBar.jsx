@@ -9,15 +9,11 @@ import { cookbook } from '../../api/api'
 import ToastNotif from '../../contexts/ToastNotifContext'
 import { Alert, Spinner } from 'react-bootstrap'
 import CookbookList from './CookbooksList'
+import Form from '../../components/Forms/Form'
 
 const DivBody = styled.div`
-    display: flex;
     width: 80%;
-    flex-direction: column;
     margin: 50px auto;
-    background-color: ${(props) => props.theme.secondaryBackground};
-    position: relative;
-    overflow: hidden;
 `
 
 const SearchBox = styled.input`
@@ -28,9 +24,9 @@ const SearchBox = styled.input`
     font-weight: 400;
     line-height: 1.5;
     color: ${(props) => props.theme.foreground};
-    background-color: ${(props) => props.theme.textboxBackground};
+    background-color: ${(props) => props.theme.inputBackground};
     appearance: none;
-    border-radius: 0.25rem;
+    border-radius: 0.5rem;
 
     ::placeholder {
         color: ${(props) => props.theme.muted};
@@ -41,14 +37,13 @@ const SearchBox = styled.input`
 `
 
 const TagSelect = styled.select`
-    display: block;
     padding: 0.475rem 2.25rem 0.475rem 0.55rem;
     font-size: 1rem;
     font-weight: 400;
     line-height: 1.5;
     color: ${(props) => props.theme.muted};
-    background-color: ${(props) => props.theme.textboxBackground};
-    border-radius: 0.25rem;
+    background-color: ${(props) => props.theme.inputBackground};
+    border-radius: 0.5rem;
 
     border-width: 0;
     outline: 0;
@@ -128,15 +123,33 @@ const SearchBar = ({ tagOptions }) => {
                     aria-label='Search Cookbooks'
                     onChange={(e) => handleChange(e, 'search')}
                 />
+                {!isCrushed && (
+                    <TagSelect
+                        value={tagField}
+                        onChange={(e) => handleChange(e, 'tag')}
+                        style={{ width: '35%', marginLeft: '10px' }}
+                    >
+                        <option value='none'>Choose...</option>
+                    </TagSelect>
+                )}
                 <Link to='/cookbook/create'>
-                    <NewButton
+                    <Form.Button
                         style={{ marginLeft: '10px' }}
                         disabled={userData == null || userData == undefined}
                     >
                         New
-                    </NewButton>
+                    </Form.Button>
                 </Link>
             </div>
+            {isCrushed && (
+                <TagSelect
+                    value={tagField}
+                    onChange={(e) => handleChange(e, 'tag')}
+                    style={{ width: '100%', marginBottom: '10px' }}
+                >
+                    <option value='none'>Choose...</option>
+                </TagSelect>
+            )}
 
             <div
                 style={{

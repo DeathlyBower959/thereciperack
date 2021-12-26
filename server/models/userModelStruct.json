@@ -1,0 +1,89 @@
+{
+    "id": "uuid4|required",
+    "name": "required",
+    "email": "required",
+    "password": "required",
+
+    "settings": {
+        "themes": [
+            {
+                "themeID": "required",
+                "name": "required",
+                "navbar": {
+                    "background": "#required"
+                },
+                "alert": {
+                    "color": "#required",
+                    "background": "#required",
+                    "border": "#required"
+                },
+                "foreground": "#required",
+                "secondaryForeground": "#required",
+                "accent": "#required",
+                "secondaryAccent": "#required",
+                "background": "#required",
+                "secondaryBackground": "#required",
+                "thirdBackground": "#required",
+                "inputBackground": "#required",
+                "muted": "#required",
+                "disabledText" : "#required",
+                "error": "#required"
+            }
+        ],
+        "selectedTheme": "themeID",
+        "seePublicRecipes": true,
+        "sharePublicRecipes": false
+    },
+    "cookbooks": [
+        {
+            "id": "uuid4|required",
+            "name": "required",
+            "description": "",
+            "coverImage": "base64",
+            "tags": ["", ""],
+            "recipes": [
+                {
+                    "id": "uuid4|required",
+                    "name": "required",
+                    "description": "required",
+                    "image": "base64",
+                    "tags": ["", ""],
+                    "ingredients": [
+                        {
+                            "id": "uuid4|required",
+                            "name": "required",
+                            "amount": "required",
+                            "unit": "required"
+                        }
+                    ],
+                    "steps": [
+                        {
+                            "id": "uuid4|required",
+                            "description": "required"
+                        }
+                    ],
+                    "servSize": "required",
+                    "prep": {
+                        "days": 0,
+                        "hours": 0,
+                        "minutes": 0
+                    },
+                    "cook": {
+                        "days": 0,
+                        "hours": 0,
+                        "minutes": 0
+                    }
+                }
+            ]
+        }
+    ],
+    "shoppingList": [
+        {
+            "id": "uuid4|required",
+            "name": "required",
+            "amount": "required",
+            "unit": "required"
+        }
+    ],
+    "token": null
+}

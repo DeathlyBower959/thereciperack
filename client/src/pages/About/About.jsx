@@ -1,21 +1,8 @@
 import React, { useContext, useEffect } from 'react'
 import styled, { ThemeContext } from 'styled-components'
-import ToastNotifContext from '../../contexts/ToastNotifContext'
 import settings from '../../settings'
-
-const DivBody = styled.div`
-    text-align: center;
-    width: 90%;
-    display: flex;
-    flex-direction: column;
-    margin: 50px auto;
-    background-color: ${(props) => props.theme.secondaryBackground};
-    -webkit-box-shadow: 0 0 2px rgba(15, 15, 15, 0.58);
-    box-shadow: 0 0 2px rgba(15, 15, 15, 0.58);
-    position: relative;
-    overflow: hidden;
-    border-radius: 20px;
-`
+import { IoConstructSharp } from 'react-icons/io5'
+import Pages from '../../components/Pages/Pages'
 
 const DivClamp = styled.div`
     text-align: center;
@@ -40,14 +27,14 @@ const Description = styled.p`
 `
 
 const About = () => {
-    const theme = useContext(ThemeContext)    
+    const theme = useContext(ThemeContext)
 
     return (
-        <DivBody>
+        <Pages.PageBody>
             <DivClamp>
                 <Header>About</Header>
 
-                <SectionTitle>Who made it?</SectionTitle>
+                <SectionTitle>Creator</SectionTitle>
                 <Description>
                     My name is Benjamin, and I am a 13 year old developer, that
                     strives to learn more. I wanted to learn something along the
@@ -58,7 +45,7 @@ const About = () => {
                     with much more interactive pages, and a faster websites.
                 </Description>
 
-                <SectionTitle>Our Purpose</SectionTitle>
+                <SectionTitle>The Purpose</SectionTitle>
                 <Description>
                     I had found some tutorials showing how to create some React
                     projects, but I soon found myself in tutorial hell. I was
@@ -75,7 +62,7 @@ const About = () => {
                     and a cleaner ui!
                 </Description>
 
-                <SectionTitle>How was it done?</SectionTitle>
+                <SectionTitle>How was it made?</SectionTitle>
                 <Description>
                     Since this was my first <i>real</i> React project, that I
                     was doing without a tutorial, Stack Overflow, Youtube, and
@@ -91,10 +78,12 @@ const About = () => {
                     writing the code from videos online.
                 </Description>
 
-                {settings.isDevMode && <h5 style={{color: theme.error}}>
-                    Still undergoing development...
-                    </h5>}
-                
+                {settings.activeDevelopment && (
+                    <h5 style={{ color: theme.error }}>
+                        <IoConstructSharp /> Development underway...{' '}
+                        <IoConstructSharp />
+                    </h5>
+                )}
 
                 <div style={{ marginBottom: '20px', marginTop: '20px' }}>
                     <a
@@ -132,7 +121,7 @@ const About = () => {
                     </a>
                 </div>
             </DivClamp>
-        </DivBody>
+        </Pages.PageBody>
     )
 }
 

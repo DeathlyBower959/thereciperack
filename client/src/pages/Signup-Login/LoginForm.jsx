@@ -1,10 +1,11 @@
 import useForm from '../../hooks/useForm'
 import validate from './LoginValidation'
 import styled from 'styled-components'
-import { Link, useNavigate} from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { users, cookbook, recipe, shopping } from '../../api/api'
 import { useContext } from 'react'
 import AccountContext from '../../contexts/AccountContext'
+import Form from '../../components/Forms/Form'
 
 const BoxContainer = styled.div`
     width: 100%;
@@ -22,7 +23,7 @@ const FormContainer = styled.form`
 
 const MutedText = styled.p`
     font-size: 11px;
-    color: ${(props) => props.theme.faded};
+    color: ${(props) => props.theme.muted};
     font-weight: 500;
     text-decoration: none;
 `
@@ -33,54 +34,17 @@ const BoldLink = styled.p`
     color: ${(props) => props.theme.accent};
     cursor: pointer;
     margin: 0 4px;
-    &:hover {
-        color: ${(props) => props.theme.accent};
-    }
+    transition: filter 250ms ease-in-out;
 `
 
-const Input = styled.input`
+const SubmitButton = styled(Form.Button)`
     width: 100%;
-    height: 42px;
-    outline: none;
-    color: ${(props) => props.theme.foreground};
-    border: 1px solid ${(props) => props.theme.secondaryBackground}08;
-    caret-color: ${(props) => props.theme.muted};
-    padding: 0px 10px;
-    border-bottom: 1.4px solid transparent;
-    transition: border 200ms ease;
-    font-size: 12px;
-    &::placeholder {
-        color: ${(props) => props.theme.muted};
-    }
-    &:not(:last-of-type) {
-        border-bottom: 1.5px solid rgba(200, 200, 200, 0.4);
-    }
-    &:focus {
-        outline: none;
-        border-bottom: 3px solid ${(props) => props.theme.accent};
-    }
-    background-color: ${(props) => props.theme.textboxBackground};
 `
 
-const SubmitButton = styled.button`
+const TextInput = styled(Form.Text)`
     width: 100%;
-    padding: 8px 25px;
-    color: ${(props) => props.theme.foreground};
-    font-size: 15px;
-    font-weight: 600;
-    border: none;
-    border-radius: 100px 100px 100px 100px;
-    cursor: pointer;
-    transition: filter 240ms ease-in-out;
-    background: ${(props) => props.theme.accent};
-    background: linear-gradient(
-        58deg,
-        ${(props) => props.theme.accent} 20%,
-        ${(props) => props.theme.secondaryAccent} 100%
-    );
-    &:hover {
-        filter: brightness(0.9);
-    }
+    margin-bottom: 3px;
+    margin-left: 0;
 `
 
 const ErrorMessage = styled.p`
@@ -91,9 +55,9 @@ const ErrorMessage = styled.p`
 `
 
 const LoginForm = () => {
-    const navigate = useNavigate();
+    const navigate = useNavigate()
 
-    const { AuthLogin} = useContext(AccountContext)
+    const { AuthLogin } = useContext(AccountContext)
 
     const Login = () => {
         AuthLogin(values.email, values.password)
@@ -109,7 +73,7 @@ const LoginForm = () => {
     return (
         <BoxContainer>
             <FormContainer onSubmit={handleSubmit} noValidate>
-                <Input
+                <TextInput
                     type='email'
                     name='email'
                     onChange={handleChange}
@@ -118,7 +82,7 @@ const LoginForm = () => {
                     required
                 />
                 {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
-                <Input
+                <TextInput
                     type='password'
                     name='password'
                     onChange={handleChange}

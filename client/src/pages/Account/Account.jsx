@@ -10,26 +10,15 @@ import { Spinner } from 'react-bootstrap'
 import { SketchPicker } from 'react-color'
 import CreateThemeModal from './CreateThemeModal'
 import DeleteAccountModal from './DeleteAccountModal'
-import { sendEmail } from '../../api/email'
 import { createTheme, deleteTheme } from '../../api/settings'
 
-// Containing div
-const DivBody = styled.div`
-    width: 90%;
-    display: flex;
-    margin: 50px auto;
-    background-color: ${(props) => props.theme.secondaryBackground};
-    -webkit-box-shadow: 0 0 2px rgba(15, 15, 15, 0.58);
-    box-shadow: 0 0 2px rgba(15, 15, 15, 0.58);
-    position: relative;
-
-    border-radius: 20px;
-`
+import Form from '../../components/Forms/Form'
+import Pages from '../../components/Pages/Pages'
 
 // Holds navigation for settings
 const Sidebar = styled.div`
     border-radius: 20px;
-    background-color: ${(props) => props.theme.textboxBackground};
+    background-color: ${(props) => props.theme.inputBackground};
 `
 
 // Button for sidebar
@@ -39,7 +28,7 @@ const SidebarButton = styled.button`
     border: 0;
     outline: 0;
 
-    background-color: ${(props) => props.theme.textboxBackground};
+    background-color: ${(props) => props.theme.inputBackground};
 
     transition: filter 240ms ease-in-out;
 
@@ -81,70 +70,6 @@ const SectionTitle = styled.h5`
     color: ${(props) => props.theme.foreground};
 `
 
-// Input field of type text
-const TextboxInput = styled.input`
-    border-radius: 0.25rem;
-
-    max-width: 500px;
-    width: 50%;
-    height: 42px;
-    outline: none;
-    color: ${(props) => props.theme.foreground};
-    border: 1px solid ${(props) => props.theme.secondaryBackground}08;
-    caret-color: ${(props) => props.theme.muted};
-    padding: 0px 10px;
-    border-bottom: 1.4px solid transparent;
-    transition: border 200ms ease;
-    font-size: 12px;
-    &::placeholder {
-        color: ${(props) => props.theme.muted};
-    }
-    &:not(:last-of-type) {
-        border-bottom: 1.5px solid rgba(200, 200, 200, 0.4);
-    }
-    &:focus {
-        outline: none;
-        border-bottom: 3px solid ${(props) => props.theme.accent};
-    }
-    background-color: ${(props) => props.theme.textboxBackground};
-
-    margin-left: 7px;
-`
-
-// Label above input
-const InputLabel = styled.p`
-    color: ${(props) => props.theme.secondaryForeground};
-    margin-top: 15px;
-    margin-bottom: 5px;
-`
-
-// Input Button Update
-const InputButton = styled.button`
-    margin-left: 10px;
-    padding: 8px 25px;
-    color: ${(props) => props.theme.foreground};
-    font-size: 15px;
-    font-weight: 600;
-    border: none;
-    border-radius: 100px 100px 100px 100px;
-    cursor: pointer;
-    transition: filter 240ms ease-in-out;
-    background: ${(props) => props.theme.accent};
-    background: linear-gradient(
-        58deg,
-        ${(props) => props.theme.accent} 20%,
-        ${(props) => props.theme.secondaryAccent} 100%
-    );
-    &:hover {
-        filter: brightness(0.9);
-    }
-
-    &:disabled {
-        cursor: auto;
-        filter: brightness(0.4);
-    }
-`
-
 // Group for an input area
 const InputGroup = styled.div`
     margin-left: 8px;
@@ -175,9 +100,9 @@ const ThemeChooser = styled.select`
     font-weight: 400;
     line-height: 1.5;
     color: ${(props) => props.theme.foreground};
-    background-color: ${(props) => props.theme.textboxBackground};
+    background-color: ${(props) => props.theme.inputBackground};
     appearance: none;
-    border-radius: 0.25rem;
+    border-radius: 0.5rem;
 
     ::placeholder {
         color: ${(props) => props.theme.muted};
@@ -187,7 +112,6 @@ const ThemeChooser = styled.select`
     outline: 0;
     margin-left: 7px;
 `
-
 // Color picker
 const StyledSketchPicker = styled(SketchPicker)`
     background: transparent !important;
@@ -195,7 +119,7 @@ const StyledSketchPicker = styled(SketchPicker)`
     margin-left: 10px;
 
     input {
-        background-color: ${(props) => props.theme.textboxBackground};
+        background-color: ${(props) => props.theme.inputBackground};
         color: ${(props) => props.theme.secondaryForeground} !important;
     }
 
@@ -215,10 +139,8 @@ const AppearanceColorTitle = styled.button`
     font-size: 15px;
     font-weight: 600;
     border: none;
-    border-radius: 100px 100px 100px 100px;
     cursor: pointer;
     transition: filter 240ms ease-in-out;
-    background: transparent;
     background: transparent;
     &:hover {
         filter: brightness(0.9);
@@ -226,7 +148,8 @@ const AppearanceColorTitle = styled.button`
 
     &:disabled {
         cursor: auto;
-        filter: brightness(0.4);
+        filter: none;
+        color: ${(props) => props.theme.disabledText};
     }
 `
 
@@ -486,7 +409,7 @@ const Account = () => {
                         return { ...prev, createTheme: false }
                     })
                 }
-                createThemeModalTrue={async (name) => {
+                createthememodaltrue={async (name) => {
                     setModalShow((prev) => {
                         return { ...prev, createTheme: false }
                     })
@@ -523,7 +446,7 @@ const Account = () => {
                     users.deleteUser(id)
                 }}
             />
-            <DivBody>
+            <Pages.PageBody>
                 <Sidebar>
                     <StickyItems>
                         <Header>Settings</Header>
@@ -564,13 +487,13 @@ const Account = () => {
                                 display: NewData?.id == null ? 'none' : '',
                             }}
                         >
-                            <InputLabel>Name</InputLabel>
-                            <TextboxInput
+                            <Form.Label>Name</Form.Label>
+                            <Form.Text
                                 onChange={handleChange}
                                 name='name'
                                 value={NewData?.name ?? ''}
                             />
-                            <InputButton
+                            <Form.Button
                                 disabled={
                                     userData?.name?.trim() ==
                                     NewData.name?.trim()
@@ -579,7 +502,7 @@ const Account = () => {
                                 onClick={updateItem}
                             >
                                 Update
-                            </InputButton>
+                            </Form.Button>
 
                             {errors.name && (
                                 <ErrorMessage>{errors.name}</ErrorMessage>
@@ -591,13 +514,13 @@ const Account = () => {
                                 display: NewData?.id == null ? 'none' : '',
                             }}
                         >
-                            <InputLabel>Email</InputLabel>
-                            <TextboxInput
+                            <Form.Label>Email</Form.Label>
+                            <Form.Text
                                 onChange={handleChange}
                                 name='email'
                                 value={NewData?.email ?? ''}
                             />
-                            <InputButton
+                            <Form.Button
                                 disabled={
                                     userData?.email?.trim() ==
                                     NewData?.email?.trim()
@@ -606,7 +529,7 @@ const Account = () => {
                                 onClick={updateItem}
                             >
                                 Update
-                            </InputButton>
+                            </Form.Button>
 
                             {errors.email ? (
                                 <ErrorMessage>{errors.email}</ErrorMessage>
@@ -622,73 +545,13 @@ const Account = () => {
                                             cursor: 'pointer',
                                         }}
                                         onClick={() => {
-                                            sendEmail(
-                                                userData.email,
-                                                'Verification Email',
-                                                `
-                                                <!DOCTYPE html>
-                                                <html lang="en">
-                                                <head>
-                                                        <meta charset="UTF-8" />
-                                                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-                                                        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-                                                        <title>Static Template</title>
-                                                        <link
-                                                        href="https://fonts.googleapis.com/css?family=Muli&amp;display=swap"
-                                                        rel="stylesheet"
-                                                        />
-                                                    </head>
-                                                    <body>
-                                                    <div
-                                                        style="
-                                                            margin: auto;
-                                                            width: 400px;
-                                                            background-color: #f6f6f6;
-                                                            padding: 10px;
-                                                            font-family: 'Muli', sans-serif;
-                                                        "
-                                                        >
-                                                        <div
-                                                            style="
-                                                            margin: 15px;
-                                                            padding: 10px;
-                                                            background-color: #fff;
-                                                            text-align: center;
-                                                            "
-                                                        >
-                                                            <h2>Thanks for signing up,<br />${userData.name}!</h2>
-                                                    
-                                                            <p style="padding-left: 25px; padding-right: 25px;">
-                                                            Please verify your email address to unlock more features!
-                                                            </p>
-                                                            
-                                                            <a href="http://localhost:5000/users/authenticate/?token=${userData.token}" target="_blank">
-                                                            <button
-                                                                style="
-                                                                width: 45%;
-                                                                padding: 10px 20px 10px 20px;
-                                                                background-color: #a74ef6;
-                                                                
-                                                                border-radius: 20px;
-                                                                outline: 0;
-                                                                border: 0;
-                                                                cursor: pointer;
-                                                                margin-bottom: 10px;
-                                                                "
-                                                                >
-                                                                Verify Email Now
-                                                                </button>
-                                                            </a>
-                                                        </div>
-                                                        </div>
-                                                        </body>
-                                                    </html>`
-                                            )
+                                            users.regenJWTToken(userData.id)
 
                                             Toast(
                                                 'Check your email for a verification link!(Check your spam)',
                                                 'info'
                                             )
+                                            
                                         }}
                                     >
                                         Resend Email
@@ -702,8 +565,8 @@ const Account = () => {
                                 display: NewData?.id == null ? 'none' : '',
                             }}
                         >
-                            <InputLabel>Password</InputLabel>
-                            <TextboxInput
+                            <Form.Label>Password</Form.Label>
+                            <Form.Text
                                 onChange={handleChange}
                                 name='password'
                                 type='password'
@@ -714,14 +577,14 @@ const Account = () => {
                                 <ErrorMessage>{errors.password}</ErrorMessage>
                             )}
 
-                            <InputLabel>New Password</InputLabel>
-                            <TextboxInput
+                            <Form.Label>New Password</Form.Label>
+                            <Form.Text
                                 onChange={handleChange}
                                 name='newPassword'
                                 type='password'
                                 value={NewData?.newPassword ?? ''}
                             />
-                            <InputButton
+                            <Form.Button
                                 disabled={
                                     userData?.password?.trim() !=
                                         NewData?.password?.trim() ||
@@ -732,7 +595,7 @@ const Account = () => {
                                 onClick={updateItem}
                             >
                                 Update
-                            </InputButton>
+                            </Form.Button>
 
                             {errors.newPassword && (
                                 <ErrorMessage>
@@ -785,22 +648,25 @@ const Account = () => {
                                     name='selectedTheme'
                                     onChange={updateSetting}
                                 >
-                                    {userData.settings?.themes?.map((theme) => {
-                                        return (
-                                            <option
-                                                selected={
-                                                    userData.settings
-                                                        ?.selectedTheme ==
-                                                    theme.themeID
-                                                }
-                                                value={theme.themeID}
-                                            >
-                                                {theme.name}
-                                            </option>
-                                        )
-                                    })}
+                                    {userData.settings?.themes?.map(
+                                        (theme, index) => {
+                                            return (
+                                                <option
+                                                    key={index}
+                                                    selected={
+                                                        userData.settings
+                                                            ?.selectedTheme ==
+                                                        theme.themeID
+                                                    }
+                                                    value={theme.themeID}
+                                                >
+                                                    {theme.name}
+                                                </option>
+                                            )
+                                        }
+                                    )}
                                 </ThemeChooser>
-                                <InputButton
+                                <Form.Button
                                     onClick={() =>
                                         setModalShow((prev) => {
                                             return {
@@ -811,7 +677,7 @@ const Account = () => {
                                     }
                                 >
                                     Create
-                                </InputButton>
+                                </Form.Button>
                             </div>
                         </InputGroup>
 
@@ -1004,7 +870,7 @@ const Account = () => {
                                         let newThemes = NewData?.settings.themes
                                         newThemes[index] = {
                                             ...newThemes[index],
-                                            textboxBackground: newColor.hex,
+                                            inputBackground: newColor.hex,
                                         }
 
                                         setNewData((prev) => {
@@ -1022,7 +888,7 @@ const Account = () => {
                                             (theme) =>
                                                 theme.themeID ==
                                                 userData.settings.selectedTheme
-                                        ).textboxBackground
+                                        ).inputBackground
                                     }
                                 ></StyledSketchPicker>
                             )}
@@ -1606,13 +1472,13 @@ const Account = () => {
                             'default_themes'
                         ) &&
                             NewData?.id != null && (
-                                <InputButton
+                                <Form.Button
                                     name='deleteTheme'
                                     style={{ marginTop: '7px' }}
                                     onClick={updateSetting}
                                 >
                                     Delete Theme
-                                </InputButton>
+                                </Form.Button>
                             )}
                     </Section>
 
@@ -1627,7 +1493,7 @@ const Account = () => {
                                 display: NewData?.id == null ? 'none' : '',
                             }}
                         >
-                            <InputLabel>
+                            <Form.Label>
                                 User ID:{' '}
                                 <ShownOnHover
                                     onClick={() => {
@@ -1639,14 +1505,14 @@ const Account = () => {
                                 >
                                     {userData.id}
                                 </ShownOnHover>
-                            </InputLabel>
+                            </Form.Label>
                         </InputGroup>
                         <InputGroup
                             style={{
                                 display: NewData?.id == null ? 'none' : '',
                             }}
                         >
-                            <InputButton
+                            <Form.Button
                                 style={{ marginLeft: '0' }}
                                 name='closeAccount'
                                 onClick={() =>
@@ -1656,11 +1522,11 @@ const Account = () => {
                                 }
                             >
                                 Close Account
-                            </InputButton>
+                            </Form.Button>
                         </InputGroup>
                     </Section>
                 </Sections>
-            </DivBody>
+            </Pages.PageBody>
         </>
     )
 }

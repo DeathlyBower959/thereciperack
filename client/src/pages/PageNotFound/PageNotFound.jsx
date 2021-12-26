@@ -6,7 +6,7 @@ import { Button } from 'react-bootstrap'
 
 const DivBody = styled.div`
     text-align: center;
-    width: 70%;
+    width: 60%;
     padding-bottom: 40px;
     display: flex;
     flex-direction: column;

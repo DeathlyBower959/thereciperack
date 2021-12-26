@@ -5,8 +5,7 @@
             "name": "Default - Dark",
 
             "navbar": {
-                "background": "#2d2d2d",
-                "link": "#a0a0a0"
+                "background": "#2d2d2d"
             },
 
             "alert": {
@@ -24,10 +23,10 @@
             "background": "#282828",
             "secondaryBackground": "#323232",
             "thirdBackground": "#3c3c3c",
-            "textboxBackground": "#444444",
+            "inputBackground": "#444444",
 
             "muted": "#a0a0a0",
-            "faded": "#949494",
+            "disabledText": "#545454",
 
             "error": "#ff5252"
         },
@@ -36,8 +35,7 @@
             "name": "Default - Light",
 
             "navbar": {
-                "background": "#d8d8d8",
-                "link": "#545454"
+                "background": "#d8d8d8"
             },
             "alert": {
                 "color": "#842029",
@@ -54,10 +52,10 @@
             "background": "#fafafa",
             "secondaryBackground": "#e6e6e6",
             "thirdBackground": "#d2d2d2",
-            "textboxBackground": "#bebebe",
+            "inputBackground": "#bebebe",
 
             "muted": "#545454",
-            "faded": "#595959",
+            "disabledText": "#a1a1a1",
 
             "error": "#ff3333"
         }    
