@@ -21,6 +21,7 @@ export const getSettings = async (req, res) => {
 
         res.status(200).json(user.settings)
     } catch (err) {
+        console.log(err)
         res.status(404).json({ message: err.message })
     }
 }

@@ -6,7 +6,9 @@ export const getShopItems = async (userID) => {
 
     try {
         const res = await Axios.get(settings.SERVER_URL + '/shopping', {
+            params: {
             userID,
+            }
         })
 
         return res

@@ -32,6 +32,7 @@ export const getRecipes = async (req, res) => {
 
         res.status(200).json(user.cookbooks[index].recipes)
     } catch (err) {
+        console.log(err)
         res.status(404).json({ message: err.message })
     }
 }

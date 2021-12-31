@@ -5,7 +5,7 @@ const InputButton = styled.button`
     margin-left: 10px;
     padding: 8px 25px;
     color: ${(props) => props.theme.foreground};
-    font-size: 15px;
+    font-size: clamp(12px, 4vw, 15px);
     font-weight: 600;
     border: none;
     border-radius: 100px 100px 100px 100px;

@@ -21,6 +21,7 @@ const Check = styled(FormCheck)`
 
 const Checkbox = ({ label, checked, ...props }) => {
     const theme = useContext(ThemeContext)
+    
     return (
         <div style={{ display: 'flex' }}>
             <Check checked={checked || false} {...props} />

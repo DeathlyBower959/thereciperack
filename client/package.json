@@ -8,6 +8,7 @@
         "@testing-library/react": "^11.2.7",
         "@testing-library/user-event": "^12.8.3",
         "axios": "^0.24.0",
+        "bcryptjs": "^2.4.3",
         "bootstrap": "^5.1.3",
         "convert-units": "^2.3.4",
         "framer-motion": "^4.1.17",
@@ -31,8 +32,10 @@
     "scripts": {
         "start": "react-scripts start",
         "build": "react-scripts build",
-        "deploy": "npm run build && echo thereciperack.ml >> build/CNAME && gh-pages -d build",
-        "regDeploy": "npm run regBuild && if (Test-Path ./build/CNAME) {Remove-Item ./build/CNAME} && gh-pages -d build",
+        "predeploy": "npm run build && echo thereciperack.ml >> build/CNAME",
+        "deploy": "gh-pages -d build",
+        "preregDeploy": "npm run build && if (Test-Path ./build/CNAME) {Remove-Item ./build/CNAME}",
+        "regDeploy": "gh-pages -d build",
         "test": "react-scripts test",
         "eject": "react-scripts eject"
     },

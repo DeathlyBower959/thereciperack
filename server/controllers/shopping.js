@@ -22,6 +22,7 @@ export const getShopItems = async (req, res) => {
 
         res.status(200).json(user.shoppingList)
     } catch (err) {
+        console.log(err)
         res.status(404).json({ message: err.message })
     }
 }

@@ -23,7 +23,7 @@ const defaultThemes = [
         thirdBackground: '#3c3c3c',
         inputBackground: '#444444',
         muted: '#a0a0a0',
-        disabledText: "#545454",
+        disabledText: '#545454',
 
         error: '#ff5252',
     },
@@ -48,14 +48,14 @@ const defaultThemes = [
         thirdBackground: '#d2d2d2',
         inputBackground: '#bebebe',
         muted: '#545454',
-        disabledText: "#a1a1a1",
+        disabledText: '#a1a1a1',
 
         error: '#ff3333',
     },
 ]
 
 const userSchema = mongoose.Schema({
-    id: { type: String, required: true, default: uuidv4() },
+    id: { type: String, required: true, default: uuidv4 },
     token: { type: String },
 
     name: {
@@ -67,12 +67,12 @@ const userSchema = mongoose.Schema({
         type: String,
         required: true,
         trim: true,
-        lowercase: true
+        lowercase: true,
     },
     password: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
     },
 
     settings: {
@@ -83,13 +83,13 @@ const userSchema = mongoose.Schema({
                         themeID: {
                             type: String,
                             required: true,
-                            trim: true
+                            trim: true,
                         },
                         name: {
                             type: String,
                             required: true,
                             default: 'No Name',
-                            trim: true
+                            trim: true,
                         },
 
                         navbar: {
@@ -101,9 +101,7 @@ const userSchema = mongoose.Schema({
                                 },
                             },
                             required: true,
-                            default: {
-                                background: defaultThemes[0].navbar.background,
-                            },
+                            default: {},
                         },
 
                         alert: {
@@ -125,9 +123,7 @@ const userSchema = mongoose.Schema({
                                 },
                             },
                             required: true,
-                            default: {
-                                background: defaultThemes[0].navbar.background,
-                            },
+                            default: {},
                         },
 
                         foreground: {
@@ -213,22 +209,22 @@ const userSchema = mongoose.Schema({
     cookbooks: {
         type: [
             {
-                id: { type: String, required: true, default: uuidv4() },
+                id: { type: String, required: true, default: uuidv4 },
                 name: {
                     type: String,
                     required: true,
                     default: 'New Recipe',
-                    trim: true
+                    trim: true,
                 },
                 description: {
                     type: String,
-                    trim: true
+                    trim: true,
                 },
                 coverImage: String,
                 tags: {
                     type: [String],
                     required: true,
-                    default: []
+                    default: [],
                 },
                 recipes: {
                     type: [
@@ -236,17 +232,17 @@ const userSchema = mongoose.Schema({
                             id: {
                                 type: String,
                                 required: true,
-                                default: uuidv4(),
+                                default: uuidv4,
                             },
                             name: {
                                 type: String,
                                 required: true,
-                                trim: true
+                                trim: true,
                             },
                             description: {
                                 type: String,
                                 required: true,
-                                trim: true
+                                trim: true,
                             },
                             image: String,
                             tags: [String],
@@ -256,22 +252,22 @@ const userSchema = mongoose.Schema({
                                         id: {
                                             type: String,
                                             required: true,
-                                            default: uuidv4(),
+                                            default: uuidv4,
                                         },
                                         name: {
                                             type: String,
                                             required: true,
-                                            trim: true
+                                            trim: true,
                                         },
                                         amount: {
                                             type: String,
                                             required: true,
-                                            trim: true
+                                            trim: true,
                                         },
                                         unit: {
                                             type: String,
                                             required: true,
-                                            trim: true
+                                            trim: true,
                                         },
                                     },
                                 ],
@@ -283,12 +279,12 @@ const userSchema = mongoose.Schema({
                                         id: {
                                             type: String,
                                             required: true,
-                                            default: uuidv4(),
+                                            default: uuidv4,
                                         },
                                         description: {
                                             type: String,
                                             required: true,
-                                            trim: true
+                                            trim: true,
                                         },
                                     },
                                 ],
@@ -297,7 +293,7 @@ const userSchema = mongoose.Schema({
                             servSize: {
                                 type: String,
                                 required: true,
-                                trim: true
+                                trim: true,
                             },
                             prep: {
                                 type: Object,
@@ -318,7 +314,7 @@ const userSchema = mongoose.Schema({
     shoppingList: {
         type: [
             {
-                id: { type: String, required: true, default: uuidv4() },
+                id: { type: String, required: true, default: uuidv4 },
                 name: { type: String, required: true, trim: true },
                 amount: { type: String, required: true, trim: true },
                 unit: { type: String, required: true, trim: true },

@@ -1,7 +1,9 @@
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import styled from 'styled-components'
 import AccountContext from '../../contexts/AccountContext'
-import ToastNotifContext from '../../contexts/ToastNotifContext'
+import { useParams } from 'react-router'
+import { urls } from '../../api/api'
+import PageNotFound from '../PageNotFound/PageNotFound'
 
 const DivBody = styled.div`
     width: 90%;
@@ -19,11 +21,21 @@ const DivBody = styled.div`
 const Landing = () => {
     const { userData } = useContext(AccountContext)
 
-    return (
-        <DivBody>
-            {/* <SearchBar /> */}
-        </DivBody>
-    )
+    const { code } = useParams()
+
+    useEffect(() => {
+        if (code) {
+            urls.getURL(code).then((res) => {
+                if (res.status != 200) {
+                    return <PageNotFound />
+                } else {
+                    window.open(res.data.longUrl)
+                }
+            })
+        }
+    }, [code])
+
+    return <DivBody>{/* <SearchBar /> */}</DivBody>
 }
 
 export default Landing

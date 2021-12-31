@@ -1,15 +1,15 @@
 import { useContext, useState } from 'react'
 import styled, { ThemeContext } from 'styled-components'
 import { Link } from 'react-router-dom'
-import IsCrushedContext from '../../contexts/IsCrushedContext'
-import AccountContext from '../../contexts/AccountContext'
+import IsCrushedContext from '../../../contexts/IsCrushedContext'
+import AccountContext from '../../../contexts/AccountContext'
 
 import CookbookCard from './CookbookCard'
-import { cookbook } from '../../api/api'
-import ToastNotif from '../../contexts/ToastNotifContext'
+import { cookbook } from '../../../api/api'
+import ToastNotif from '../../../contexts/ToastNotifContext'
 import { Alert, Spinner } from 'react-bootstrap'
 import CookbookList from './CookbooksList'
-import Form from '../../components/Forms/Form'
+import Form from '../../../components/Forms/Form'
 
 const DivBody = styled.div`
     width: 80%;
@@ -82,7 +82,7 @@ const StyledSpinner = styled(Spinner)`
     height: 50px;
 `
 
-const SearchBar = ({ tagOptions }) => {
+const SearchBar = () => {
     const isCrushed = useContext(IsCrushedContext)
     const { userData, setUserData } = useContext(AccountContext)
     const Toast = useContext(ToastNotif)
@@ -109,6 +109,24 @@ const SearchBar = ({ tagOptions }) => {
         }
     }
 
+    const getTags = () => {
+        let tags = []
+        userData?.cookbooks?.forEach(cookbook => {
+            cookbook.tags?.forEach(tag => {
+                if (!tags.includes(tag)) tags.push(tag)
+            })
+        })
+
+        return tags;
+    }
+
+    const tags = getTags();
+    const tagOptions = tags.map((tag, index) => (
+        <option key={`${tag.charCodeAt(Math.random() * tag.length)}${index}`} value={tag}>
+            {tag}
+        </option>
+    ))
+
     return (
         <DivBody>
             <div
@@ -130,6 +148,7 @@ const SearchBar = ({ tagOptions }) => {
                         style={{ width: '35%', marginLeft: '10px' }}
                     >
                         <option value='none'>Choose...</option>
+                        {tagOptions}
                     </TagSelect>
                 )}
                 <Link to='/cookbook/create'>
@@ -148,6 +167,9 @@ const SearchBar = ({ tagOptions }) => {
                     style={{ width: '100%', marginBottom: '10px' }}
                 >
                     <option value='none'>Choose...</option>
+                    {tagOptions.map((x) => {
+                        return <option value={x}>{x}</option>
+                    })}
                 </TagSelect>
             )}
 
@@ -168,7 +190,7 @@ const SearchBar = ({ tagOptions }) => {
                     ))}
                 <div
                     style={{
-                        width: '55%',
+                        width: '70%',
                         display:
                             userData == null || userData == 'none'
                                 ? 'none'

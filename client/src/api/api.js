@@ -2,7 +2,8 @@ import * as cookbook from './cookbook'
 import * as recipe from './recipe'
 import * as shopping from './shopping'
 import * as users from './users'
+import * as urls from './urls'
 import * as email from './email'
 
 
-export { cookbook, recipe, shopping, users, email }
+export { cookbook, recipe, shopping, users, email, urls }

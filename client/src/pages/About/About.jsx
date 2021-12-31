@@ -6,23 +6,29 @@ import Pages from '../../components/Pages/Pages'
 
 const DivClamp = styled.div`
     text-align: center;
-    width: 50%;
+    max-width: 85%;
+    width: 1000px;
     margin: auto;
 `
 
 const Header = styled.h2`
+    font-size: clamp(28px, 4vw, 34px);
+
     padding: 40px 0px 0px 0px;
     color: ${(props) => props.theme.secondaryForeground};
     font-weight: bold;
 `
 
 const SectionTitle = styled.h3`
+    font-size: clamp(22px, 4vw, 28px);
+
     color: ${(props) => props.theme.foreground};
     margin-top: 20px;
 `
 
 const Description = styled.p`
-    font-size: 20px;
+    font-size: clamp(16px, 4vw, 22px);
+
     color: ${(props) => props.theme.secondaryForeground};
 `
 
@@ -59,21 +65,21 @@ const About = () => {
                     decided to make this website to help manage, and share your
                     recipes. I know that they are many websites out there just
                     like this, but I wanted it to have more features, no ads,
-                    and a cleaner ui!
+                    and a cleaner user interface!
                 </Description>
 
                 <SectionTitle>How was it made?</SectionTitle>
                 <Description>
-                    Since this was my first <i>real</i> React project, that I
-                    was doing without a tutorial, Stack Overflow, Youtube, and
-                    Google were my best friends. I first figured out how to make
-                    the client side of the website, the part that you see. It
-                    took a bit to figure out, but I picked it up in the end. I
-                    then had to learn how to make the sever side, the part that
-                    creates your account, and saves your data and settings. This
-                    bit was a little harder than I had originally thought it
-                    would be, but it worked out in the end. It's really nice to
-                    see that I thought about the code that went into this
+                    Since this was my first <i>real</i> React project that I was
+                    doing without a tutorial, Stack Overflow, Youtube, Google,
+                    and Discord were my best friends. I first figured out how to
+                    make the client side of the website, the part that you see.
+                    It took a bit to figure out, but I picked it up in the end.
+                    I then had to learn how to make the sever side, the part
+                    that creates your account, and saves your data and settings.
+                    This bit was a little harder than I had originally thought
+                    it would be, but it worked out in the end. It's really nice
+                    to see that I thought about the code that went into this
                     website, and that I can be proud of it, instead of just
                     writing the code from videos online.
                 </Description>
@@ -89,6 +95,7 @@ const About = () => {
                     <a
                         href='https://github.com/DeathlyBower959/thereciperack'
                         target='_blank'
+                        rel='noopener noreferrer'
                     >
                         <svg
                             xmlns='http://www.w3.org/2000/svg'
@@ -105,6 +112,7 @@ const About = () => {
                     <a
                         href='https://youtube.com/DeathlyBower959?sub_confirmation=1'
                         target='_blank'
+                        rel='noopener noreferrer'
                     >
                         <svg
                             style={{ marginLeft: '10px' }}

@@ -12,18 +12,13 @@ I didn't want to make a pointless project, I wanted to make one that would be us
 Since this was my first real React project, Stack Overflow, YouTube, and Google were really my best friends. I figured out how to use React to make the client side, and then learned the basics of `axios`, `express`, and `mongooose`. This was nice to work on as I really got to *think* about the code, instead of just writing down code from videos. 
 
 ## Installation
-
 - Clone this repository somewhere on your computer
-- Edit the `template.env` and change `MONGO_URI` to your MongoDB URI (PORT is optional, default is `5000`)
+- Edit the `template.env` to the proper secrets
 - Rename the `template.env` to `.env`
-- All done!
-
-## Usage
-
-Run `npm installAll` in the root directory to initialize all required dependencies.
+- Run `npm installAll` in the root directory to initialize all required dependencies.
 
 #### Development
-If you are developing the website, then use these to start the development server.
+Running these commands will start the development sever
 ```
 Terminal 1:
   $ cd client
@@ -37,22 +32,24 @@ Terminal 2:
 ```
 
 #### Publishing
-If you want to publish the client to the web, then follow the steps below.
+If you want to publish the react site to the web, then follow the steps below.
 1. Create a new GitHub repository, and mark it as public
-2. Open a new terminal located in the client folder
-3. Run these commands 
+2. Open the `package.json` in the client folder
+3. At the top of the `package.json`, change `homepage` to your websites link. (Make sure it has `http://` and the `.ml`/`.com` after)
+  - Custom Domain: Change `thereciperack.ml` on line 34 to your own custom domain.
+4. Open a new terminal located in the project root folder
+5. Run these commands
 	1. `git init`
 	2. `git add .`
 	3. `git commit -m "First Commit"`
 	4. `git branch -M main`
 	5. `git remote add origin https://github.com/YOUR_USERNAME/REPOSITORY_NAME.git` (Or copy from repo landing page)
 	6. `git push -u origin main`
-4. Open the `package.json` in the client folder
-5. At the top of the `package.json`, change `homepage` to the websites link. (Make sure it has `http://` and the extension after)
-6. 
-  - Custom Domain: Change `thereciperack.ml` on line 30 to your own custom domain and do `npm run deploy`.
+4. 
+  - Custom Domain: `npm run deploy`.
   - Normal Domain: `npm run regDeploy`
-8. Give it a few minutes, and check your website to see if it has deployed.
+8. Check and see if `Enforce HTTPS` is on the correct choice on your github pages
+9. Give it a few minutes, and check your website to see if it has deployed.
 
 ## Technologies
 - [React](https://reactjs.org/)

@@ -1,17 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Route, Routes as ReactRoutes } from 'react-router-dom'
-
+import Routes from './components/Routes/Routes'
 
 import { shopping, users, recipe, cookbook } from './api/api'
 
 import styled, { ThemeProvider } from 'styled-components'
-import { themes } from './themes.json'
-
-import Routes from './components/Routes/Routes'
-
-import Navbar from './components/Navigation/Navbar'
-import PageNotFound from './pages/PageNotFound/PageNotFound'
-import SignupLogin from './pages/Signup-Login/Signup-Login'
 
 import useLocalStorage from './hooks/useLocalStorage'
 import Landing from './pages/Landing/Landing'
@@ -19,19 +12,24 @@ import Landing from './pages/Landing/Landing'
 import IsCrushed from './contexts/IsCrushedContext'
 import ToastNotifContext from './contexts/ToastNotifContext'
 import AccountContext from './contexts/AccountContext'
-import About from './pages/About/About'
 
-import { toast } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import Account from './pages/Account/Account'
-
-import defaultThemes from './themes.json'
-
-import settings from './settings'
-import Cookbooks from './pages/Cookbooks/Cookbooks'
-import CreateCookbook from './pages/CreateCookbook/CreateCookbook'
 
 import { IoConstructSharp } from 'react-icons/io5'
+
+import defaultThemes from './themes.json'
+import settings from './settings'
+
+import Navbar from './components/Navigation/Navbar.jsx'
+
+import PageNotFound from './pages/PageNotFound/PageNotFound'
+import Account from './pages/Account/Account'
+import About from './pages/About/About'
+import SignupLogin from './pages/Signup-Login/Signup-Login'
+import Cookbooks from './pages/CookbookPages/Cookbooks/Cookbooks'
+import CreateCookbook from './pages/CookbookPages/CreateCookbook/CreateCookbook'
+import Recipes from './pages/RecipePages/Recipes/Recipes'
 
 const AppContainer = styled.div`
     height: 100%;
@@ -49,8 +47,6 @@ const Background = styled.div`
     top: 0;
 `
 
-toast.configure()
-
 const App = () => {
     const [localAuth, setLocalAuth] = useLocalStorage('email.password', {
         email: null,
@@ -60,7 +56,7 @@ const App = () => {
     const AuthLogin = async (email, password) => {
         const LoginPromise = () => {
             return new Promise(async (resolve, reject) => {
-                const retrievedUser = await users.getUser(email, password)
+                const retrievedUser = await users.getUserHashed(email, password)
 
                 if (!retrievedUser || retrievedUser?.status != 200) {
                     if (userData == 'none') setUserData(null)
@@ -142,25 +138,22 @@ const App = () => {
         icon = null
     ) => {
         if (!message) return console.error('Failed to send toast, no message!')
+
         switch (type) {
             case 'success':
                 toast.success(message, {
-                    position: toast.POSITION.BOTTOM_RIGHT,
                     icon,
                     style: {
                         backgroundColor: currentTheme.secondaryBackground,
                         color: currentTheme.foreground,
                     },
                     progressStyle: {
-                        background: `linear-gradient(58deg,${(props) =>
-                            props.currentTheme.accent} 20%,${(props) =>
-                            props.currentTheme.secondaryAccent} 100%)`,
+                        background: `linear-gradient(58deg,${currentTheme.accent} 20%,${currentTheme.secondaryAccent} 100%)`,
                     },
                 })
                 break
             case 'info':
                 toast.info(message, {
-                    position: toast.POSITION.BOTTOM_RIGHT,
                     icon,
                     style: {
                         backgroundColor: currentTheme.secondaryBackground,
@@ -173,7 +166,6 @@ const App = () => {
                 break
             case 'warn':
                 toast.warn(message, {
-                    position: toast.POSITION.BOTTOM_RIGHT,
                     icon,
                     style: {
                         backgroundColor: currentTheme.secondaryBackground,
@@ -186,7 +178,6 @@ const App = () => {
                 break
             case 'error':
                 toast.error(message, {
-                    position: toast.POSITION.BOTTOM_RIGHT,
                     icon,
                     style: {
                         backgroundColor: currentTheme.secondaryBackground,
@@ -206,7 +197,6 @@ const App = () => {
                         render() {
                             return message.pending || 'Working on it...'
                         },
-                        position: toast.POSITION.BOTTOM_RIGHT,
                         icon,
                         style: {
                             backgroundColor: currentTheme.secondaryBackground,
@@ -220,7 +210,6 @@ const App = () => {
                         render() {
                             return message.success || 'All done!'
                         },
-                        position: toast.POSITION.BOTTOM_RIGHT,
                         icon,
                         style: {
                             backgroundColor: currentTheme.secondaryBackground,
@@ -236,7 +225,6 @@ const App = () => {
                                 message.error || 'Whoops, this action failed!'
                             )
                         },
-                        position: toast.POSITION.BOTTOM_RIGHT,
                         icon,
                         style: {
                             backgroundColor: currentTheme.secondaryBackground,
@@ -251,7 +239,6 @@ const App = () => {
                 return response
             default:
                 toast(message, {
-                    position: toast.POSITION.BOTTOM_RIGHT,
                     icon,
                     style: {
                         backgroundColor: currentTheme.secondaryBackground,
@@ -267,6 +254,17 @@ const App = () => {
 
     return (
         <AppContainer>
+            <ToastContainer
+                position='bottom-right'
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss={false}
+                draggable
+                pauseOnHover
+            />
             <ToastNotifContext.Provider value={SendToast}>
                 <AccountContext.Provider
                     value={{
@@ -288,6 +286,9 @@ const App = () => {
 
                                 {/* Landing Page */}
                                 <Route path='/' element={<Landing />} />
+
+                                {/* Short Url */}
+                                <Route path='/:code' element={<Landing />} />
 
                                 {/* Extra Routes */}
                                 <Route path='/about' element={<About />} />
@@ -330,7 +331,7 @@ const App = () => {
                                     <Route
                                         path='/cookbook/:cookbookID'
                                         exact
-                                        element={<PageNotFound />}
+                                        element={<Recipes />}
                                     />
 
                                     {/* Edit a cookbook (name, desc, img) */}

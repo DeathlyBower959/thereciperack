@@ -6,7 +6,9 @@ export const getCookbooks = async (userID) => {
 
     try {
         const res = await Axios.get(settings.SERVER_URL + '/cookbook', {
+            params: {
             userID,
+            }
         })
 
         return res

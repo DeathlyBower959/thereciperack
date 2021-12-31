@@ -33,13 +33,15 @@ export const getUser = async (email, password) => {
     }
 }
 
-export const getUserByID = async (userID) => {
-    if (!userID) return console.error('Missing userID')
+export const getUserHashed = async (email, hashedPass) => {
+    if (!email) return console.error('Missing email')
+    if (!hashedPass) return console.error('Missing hashedPass')
 
     try {
         const res = await Axios.get(settings.SERVER_URL + '/users', {
             params: {
-                userID,
+                email,
+                hashedPass,
             },
         })
 
@@ -125,13 +127,14 @@ export const regenJWTToken = async (userID) => {
     }
 }
 
-export const editUser = async (userID, newUser) => {
+export const editUser = async (userID, oldPass, newUser) => {
     if (!userID) return console.error('Missing userID')
     if (!newUser) return console.error('Missing newUser')
 
     try {
         const res = await Axios.put(settings.SERVER_URL + '/users', {
             userID,
+            oldPass, 
             newUser,
         })
 

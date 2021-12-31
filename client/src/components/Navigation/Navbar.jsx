@@ -19,7 +19,7 @@ import Logo from '../../assets/logo.svg'
 const DropdownItem = styled(NavDropdown.Item)`
     display: block;
     width: 100%;
-    padding: 0.5rem 1rem;
+    padding: 0.25rem 1rem;
     color: ${(props) => props.theme.muted};
     clear: both;
     font-weight: 400;
@@ -96,7 +96,7 @@ const NavigationBar = () => {
                         className='align-top'
                     />{' '}
                     <Navbar.Brand style={{ color: theme.foreground }}>
-                        The Recipe Rack
+                        Testing Proving Game
                     </Navbar.Brand>
                 </Link>
 
@@ -113,7 +113,7 @@ const NavigationBar = () => {
                 </Navbar.Toggle>
 
                 <Navbar.Collapse id='basic-navbar-nav'>
-                    <Nav className='me-auto my-2 my-lg-0' navbarScroll>
+                    <Nav className='me-auto my-2 my-lg-0'>
                         {/* <NavigationDropdown title='Test'>
                             <DropdownItem as={Link} to='/link'>
                                 Link

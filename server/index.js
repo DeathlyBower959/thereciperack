@@ -10,6 +10,7 @@ import cookbookRoutes from './routes/cookbook.js'
 import recipeRoutes from './routes/recipe.js'
 import shoppingRoute from './routes/shopping.js'
 import settingRoute from './routes/settings.js'
+import urlsRoute from './routes/urls.js'
 import emailRoute from './routes/email.js'
 import bodyParser from 'body-parser'
 
@@ -20,6 +21,11 @@ app.use(bodyParser.urlencoded({ limit: '25mb', extended: true }))
 app.use(cors())
 
 // Routes
+app.get('/', (req, res) => {
+    res.send('Online!')
+})
+
+app.use('/urls', urlsRoute)
 app.use('/users', userRoutes)
 app.use('/cookbook', cookbookRoutes)
 app.use('/recipe', recipeRoutes)
@@ -27,11 +33,16 @@ app.use('/shopping', shoppingRoute)
 app.use('/settings', settingRoute)
 app.use('/email', emailRoute)
 
-// Connection
-mongoose.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-})
+// MongoDB Connection
+try {
+    mongoose.connect(process.env.MONGO_URI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    })
+} catch (err) {
+    console.log('Failed to connect to database')
+    process.exit(1)
+}
 
 const PORT = isNaN(process.env.PORT) ? 5000 : process.env.PORT
 app.listen(PORT, () => {

@@ -2,40 +2,46 @@ import User from '../models/userModel.js'
 import jwt from 'jsonwebtoken'
 import { send } from './email.js'
 
+import bcrypt from 'bcrypt'
+import settings from '../settings.js'
+
 export const getUser = async (req, res) => {
     const userData = req.query
 
-    if ((!userData.email || !userData.password) && !userData.userID) {
+    if (!userData.email || (!userData.password && !userData.hashedPass)) {
         let missing = []
         if (!userData.email) missing.push('email')
         if (!userData.password) missing.push('password')
-        if (!userData.userID) missing.push('userID')
+        if (!userData.hashedPass) missing.push('hashedPass')
 
         return res.status(400).json({
-            message: 'Missing email/password || userID',
+            message: 'Missing email/password/hashedPass',
             missing,
             data: userData,
         })
     }
 
     try {
-        let user
+        const user = await User.findOne({
+            email: userData.email,
+        })
 
-        if (userData.userID) user = await User.findOne({ id: userData.userID })
-        else {
-            user = await User.findOne({
-                email: userData.email,
-                password: userData.password,
-            })
-        }
-
-        if (user == null || user == undefined)
+        if (!user)
             return res
                 .status(404)
                 .json({ message: 'User not found', data: userData })
 
-        res.status(200).json(user)
+        if (userData.hashedPass) {
+            if (userData.hashedPass == user.password)
+                return res.status(200).json(user)
+        } else {
+            if (await bcrypt.compare(userData.password, user.password))
+                return res.status(200).json(user)
+        }
+
+        res.status(400).json({ message: 'Bad Credentials' })
     } catch (err) {
+        console.log(err)
         res.status(404).json({ message: err.message })
     }
 }
@@ -64,16 +70,19 @@ export const createUser = async (req, res) => {
             data: userData,
         })
 
-    const newUser = new User({
+    const encryptedPass = await bcrypt.hash(userData.password, 10)
+
+    const newUser = await User.create({
         ...userData,
-        email: userData.email?.toLowerCase(),
+        email: userData.email.toLowerCase(),
+        password: encryptedPass,
     })
 
     const token = jwt.sign(
-        { id: newUser.id, email: userData.email.toLowerCase() },
+        { id: newUser.id, email: newUser.email },
         process.env.JWT_TOKEN,
         {
-            expiresIn: '10m',
+            expiresIn: '1h',
         }
     )
 
@@ -119,7 +128,7 @@ export const createUser = async (req, res) => {
                   Please verify your email address to unlock more features!
                 </p>
         
-                <a href="http://localhost:5000/users/authenticate/?token=${token}" target="_blank" >
+                <a href="${settings.SERVER_URL}/users/authenticate/?token=${token}" target="_blank" >
                   <button
                     style="
                       width: 45%;
@@ -148,6 +157,7 @@ export const createUser = async (req, res) => {
 
         res.status(201).json(newUser)
     } catch (err) {
+        console.log(err)
         res.status(409).json({ message: err.message })
     }
 }
@@ -168,7 +178,7 @@ export const authenticateUser = async (req, res) => {
 
     try {
         const decoded = jwt.verify(userData.token, process.env.JWT_TOKEN)
-        
+
         const foundUser = await User.findOne({ id: decoded.id })
 
         if (!foundUser) {
@@ -197,6 +207,7 @@ export const authenticateUser = async (req, res) => {
         </html>
         `)
     } catch (err) {
+        console.log(err)
         if (err.message == 'jwt expired') res.status(401).send('Token expired')
         else res.status(401).send('Invalid Token')
     }
@@ -214,7 +225,6 @@ export const regenJWTToken = async (req, res) => {
             data: userData,
         })
     }
-
 
     try {
         const foundUser = await User.findOne({ id: userData.userID })
@@ -241,10 +251,10 @@ export const regenJWTToken = async (req, res) => {
             }
         )
 
-        foundUser.token = token;
-        
+        foundUser.token = token
+
         foundUser.save()
-        
+
         send(
             foundUser.email,
             'Verification Email',
@@ -285,7 +295,7 @@ export const regenJWTToken = async (req, res) => {
                         Please verify your email address to unlock more features!
                         </p>
                         
-                        <a href="http://localhost:5000/users/authenticate/?token=${foundUser.token}" target="_blank" >
+                        <a href="${settings.SERVER_URL}/users/authenticate/?token=${foundUser.token}" target="_blank" >
                         <button
                             style="
                             width: 45%;
@@ -307,8 +317,8 @@ export const regenJWTToken = async (req, res) => {
                     </body>
                 </html>`
         )
-
     } catch (err) {
+        console.log(err)
         res.status(401).send('Failed to regenerate token')
     }
 }
@@ -316,37 +326,56 @@ export const regenJWTToken = async (req, res) => {
 export const updateUser = async (req, res) => {
     const userData = req.body
 
-    if (!userData.userID || !userData.newUser) {
+    if (!userData.userID || !userData.oldPass || !userData.newUser) {
         let missing = []
         if (!userData.userID) missing.push('userID')
+        if (!userData.oldPass) missing.push('oldPass')
         if (!userData.newUser) missing.push('newUser')
+
         return res.status(400).json({
-            message: 'Missing userID/newUser',
+            message: 'Missing userID/oldPass/newUser',
             missing,
             data: userData,
         })
     }
 
     try {
-        if (
-            userData.newUser.password == undefined ||
-            userData.newUser.password == null
-        )
-            delete userData.newUser.password
+        const user = await User.findOne({ id: userData.userID })
 
-        const newUser = await User.findOneAndUpdate(
-            { id: userData.userID },
-            userData.newUser,
-            { returnOriginal: false }
-        )
-
-        if (newUser == null || newUser == undefined)
+        if (!user)
             return res
                 .status(404)
                 .json({ message: 'User not found', data: userData })
 
-        res.status(201).json(newUser)
+        if (!(await bcrypt.compare(userData.oldPass, user.password))) {
+            return res.status(400).json({ message: 'Invalid Password' })
+        }
+
+        if (await bcrypt.compare(userData.newUser.newPassword, user.password)) {
+            return res.status(400).json({ message: 'Password Identical' })
+        }
+
+        const encryptedPass = await bcrypt.hash(
+            userData.newUser.newPassword,
+            10
+        )
+
+        if (userData?.newUser?.newPassword) delete userData.newUser.newPassword
+        if (userData?.newUser?.cNewPassword)
+            delete userData.newUser.cNewPassword
+
+        const updatedUser = await User.findOneAndUpdate(
+            { id: userData.userID },
+            {
+                ...userData.newUser,
+                password: encryptedPass,
+            },
+            { returnOriginal: false }
+        )
+
+        res.status(201).json(updatedUser)
     } catch (err) {
+        console.log(err)
         res.status(409).json({ message: err.message })
     }
 }
@@ -372,6 +401,7 @@ export const deleteUser = async (req, res) => {
 
         res.status(200).json()
     } catch (err) {
+        console.log(err)
         res.status(404).json({ message: err.message })
     }
 }

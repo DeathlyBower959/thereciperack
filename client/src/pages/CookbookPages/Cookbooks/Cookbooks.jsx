@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import Pages from '../../components/Pages/Pages'
+import Pages from '../../../components/Pages/Pages'
 import SearchBar from '../Cookbooks/SearchBar'
 
 

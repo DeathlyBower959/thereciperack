@@ -7,8 +7,10 @@ export const getRecipes = async (userID, cookbookID) => {
 
     try {
         const res = await Axios.get(settings.SERVER_URL + '/recipe', {
+            params: {
             userID,
             cookbookID,
+            }
         })
 
         return res
@@ -108,9 +110,11 @@ export const deleteRecipe = async (userID, cookbookID, recipeID) => {
     if (!recipeID) return console.error('Missing recipeID')
     try {
         const res = await Axios.delete(settings.SERVER_URL + '/recipe', {
-            userID,
-            cookbookID,
-            recipeID,
+            data: {
+                userID,
+                cookbookID,
+                recipeID,
+            },
         })
 
         return res

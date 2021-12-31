@@ -1,4 +1,5 @@
 import User from '../models/userModel.js'
+import { v4 as uuidv4 } from 'uuid'
 
 export const getCookbooks = async (req, res) => {
     const userData = req.query
@@ -17,6 +18,7 @@ export const getCookbooks = async (req, res) => {
 
         res.status(200).json(user.cookbooks)
     } catch (err) {
+        console.log(err)
         res.status(404).json({ message: err.message })
     }
 }
@@ -40,7 +42,7 @@ export const createCookbook = async (req, res) => {
             { id: userData.userID },
             {
                 $push: {
-                    cookbooks: userData.cookbook,
+                    cookbooks: {...userData.cookbook, id: uuidv4()},
                 },
             },
             { returnOriginal: false }

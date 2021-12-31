@@ -6,7 +6,9 @@ export const getSettings = async (userID) => {
 
     try {
         const res = await Axios.get(settings.SERVER_URL + '/settings', {
+            params: {
             userID,
+            }
         })
 
         return res

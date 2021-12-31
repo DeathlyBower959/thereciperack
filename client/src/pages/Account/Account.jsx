@@ -1,10 +1,11 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import styled, { ThemeContext } from 'styled-components'
+import bcrypt from 'bcryptjs'
+
 import { users } from '../../api/api'
 import AccountContext from '../../contexts/AccountContext'
 import ToastNotif from '../../contexts/ToastNotifContext'
 
-import Checkbox from '../../components/Forms/Checkbox'
 import { Spinner } from 'react-bootstrap'
 
 import { SketchPicker } from 'react-color'
@@ -14,6 +15,8 @@ import { createTheme, deleteTheme } from '../../api/settings'
 
 import Form from '../../components/Forms/Form'
 import Pages from '../../components/Pages/Pages'
+import IsCrushed from '../../contexts/IsCrushedContext'
+import { IoConstructOutline } from 'react-icons/io5'
 
 // Holds navigation for settings
 const Sidebar = styled.div`
@@ -111,6 +114,7 @@ const ThemeChooser = styled.select`
     border-width: 0;
     outline: 0;
     margin-left: 7px;
+    margin-right: 10px;
 `
 // Color picker
 const StyledSketchPicker = styled(SketchPicker)`
@@ -164,6 +168,14 @@ const ShownOnHover = styled.span`
     }
 `
 
+const FormButton = styled(Form.Button)`
+    margin-left: 0;
+`
+
+const FormText = styled(Form.Text)`
+    margin-right: 10px;
+`
+
 // Scroll to any element, with an offset of x pixels
 const scrollTo = (id) => {
     var element = document.getElementById(id)
@@ -189,6 +201,7 @@ const Account = () => {
     const { setLocalAuth, userData, setUserData, AuthLogout } =
         useContext(AccountContext)
     const Toast = useContext(ToastNotif)
+    const isCrushed = useContext(IsCrushed)
 
     const [errors, setErrors] = useState({})
     const [NewData, setNewData] = useState({ ...userData, password: null })
@@ -263,26 +276,43 @@ const Account = () => {
                 newErr.password = 'Password must be 8 or more characters'
         }
 
-        if (e.target.name == 'newPassword') {
-            if (!NewData.newPassword)
-                newErr.newPassword = 'You have to specify a new password'
-            else if (NewData.password.toString().trim() == '')
-                newErr.newPassword = 'You have to specify a new password'
-            else if (NewData.newPassword?.length < 8)
-                newErr.newPassword = 'Password must be 8 or more characters'
-            else if (NewData.newPassword == userData.password)
-                newErr.newPassword = 'Password must be different'
+        if (e.target.name == 'cNewPassword') {
+            if (
+                !NewData.newPassword ||
+                NewData.newPassword.toString().trim() == '' ||
+                NewData?.password?.trim() == NewData?.newPassword?.trim() ||
+                !NewData.cNewPassword ||
+                NewData.password.toString().trim() == '' ||
+                NewData?.password?.trim() == NewData?.cNewPassword?.trim()
+            )
+                newErr.cNewPassword = 'You must specify a new password'
+            else if (
+                NewData?.newPassword?.trim() !== NewData?.cNewPassword?.trim()
+            )
+                newErr.cNewPassword = 'Passwords do not match'
+            else if (
+                NewData.newPassword?.length < 8 ||
+                NewData.cNewPassword?.length < 8
+            )
+                newErr.cNewPassword =
+                    'New password must be 8 or more characters'
             else {
-                const res = await users.editUser(userData.id, {
+                const res = await users.editUser(userData.id, NewData.password, {
                     ...NewData,
                     password: NewData.newPassword,
                 })
-                if (res.status != 201)
+                if (res.status != 201) {
+                    console.error(res.data.message)
                     Toast('Failed to update password...', 'error')
-                else {
+                } else {
                     setUserData(res.data)
                     setNewData((prev) => {
-                        return { ...prev, password: null, newPassword: null }
+                        return {
+                            ...prev,
+                            password: null,
+                            newPassword: null,
+                            cNewPassword: null,
+                        }
                     })
                     setLocalAuth({
                         email: res.data.email,
@@ -446,7 +476,9 @@ const Account = () => {
                     users.deleteUser(id)
                 }}
             />
-            <Pages.PageBody>
+            <Pages.PageBody
+                style={{ flexDirection: isCrushed ? 'column' : 'row' }}
+            >
                 <Sidebar>
                     <StickyItems>
                         <Header>Settings</Header>
@@ -488,12 +520,12 @@ const Account = () => {
                             }}
                         >
                             <Form.Label>Name</Form.Label>
-                            <Form.Text
+                            <FormText
                                 onChange={handleChange}
                                 name='name'
                                 value={NewData?.name ?? ''}
                             />
-                            <Form.Button
+                            <FormButton
                                 disabled={
                                     userData?.name?.trim() ==
                                     NewData.name?.trim()
@@ -502,7 +534,7 @@ const Account = () => {
                                 onClick={updateItem}
                             >
                                 Update
-                            </Form.Button>
+                            </FormButton>
 
                             {errors.name && (
                                 <ErrorMessage>{errors.name}</ErrorMessage>
@@ -515,12 +547,12 @@ const Account = () => {
                             }}
                         >
                             <Form.Label>Email</Form.Label>
-                            <Form.Text
+                            <FormText
                                 onChange={handleChange}
                                 name='email'
                                 value={NewData?.email ?? ''}
                             />
-                            <Form.Button
+                            <FormButton
                                 disabled={
                                     userData?.email?.trim() ==
                                     NewData?.email?.trim()
@@ -529,7 +561,7 @@ const Account = () => {
                                 onClick={updateItem}
                             >
                                 Update
-                            </Form.Button>
+                            </FormButton>
 
                             {errors.email ? (
                                 <ErrorMessage>{errors.email}</ErrorMessage>
@@ -537,7 +569,7 @@ const Account = () => {
                                 userData?.email?.trim() ==
                                     NewData?.email?.trim() &&
                                 userData.token != null && (
-                                    <p
+                                    <Form.Label
                                         style={{
                                             margin: '3px auto auto 12px',
                                             color: theme.secondaryForeground,
@@ -551,11 +583,10 @@ const Account = () => {
                                                 'Check your email for a verification link!(Check your spam)',
                                                 'info'
                                             )
-                                            
                                         }}
                                     >
                                         Resend Email
-                                    </p>
+                                    </Form.Label>
                                 )
                             )}
                         </InputGroup>
@@ -566,7 +597,7 @@ const Account = () => {
                             }}
                         >
                             <Form.Label>Password</Form.Label>
-                            <Form.Text
+                            <FormText
                                 onChange={handleChange}
                                 name='password'
                                 type='password'
@@ -578,28 +609,46 @@ const Account = () => {
                             )}
 
                             <Form.Label>New Password</Form.Label>
-                            <Form.Text
+                            <FormText
                                 onChange={handleChange}
                                 name='newPassword'
                                 type='password'
                                 value={NewData?.newPassword ?? ''}
                             />
-                            <Form.Button
-                                disabled={
-                                    userData?.password?.trim() !=
-                                        NewData?.password?.trim() ||
-                                    NewData?.password?.trim() ==
-                                        NewData?.newPassword?.trim()
-                                }
-                                name='newPassword'
-                                onClick={updateItem}
-                            >
-                                Update
-                            </Form.Button>
-
                             {errors.newPassword && (
                                 <ErrorMessage>
                                     {errors.newPassword}
+                                </ErrorMessage>
+                            )}
+
+                            <Form.Label>Confirm New Password</Form.Label>
+                            <FormText
+                                onChange={handleChange}
+                                name='cNewPassword'
+                                type='password'
+                                value={NewData?.cNewPassword ?? ''}
+                            />
+
+                            <FormButton
+                                disabled={
+                                    !NewData?.password?.trim() ||
+                                    !NewData?.newPassword?.trim() ||
+                                    !NewData?.cNewPassword?.trim() ||
+                                    NewData?.newPassword?.trim() !==
+                                        NewData?.cNewPassword?.trim() ||
+                                    NewData?.password?.trim() ==
+                                        NewData?.newPassword?.trim() ||
+                                    NewData?.password?.trim() ==
+                                        NewData?.cNewPassword?.trim()
+                                }
+                                name='cNewPassword'
+                                onClick={updateItem}
+                            >
+                                Update
+                            </FormButton>
+                            {errors.cNewPassword && (
+                                <ErrorMessage>
+                                    {errors.cNewPassword}
                                 </ErrorMessage>
                             )}
                         </InputGroup>
@@ -615,13 +664,13 @@ const Account = () => {
                                 display: NewData?.id == null ? 'none' : '',
                             }}
                         >
-                            <Checkbox
+                            <Form.Check
                                 name='seePublicRecipes'
                                 label='See public recipes'
                                 checked={NewData?.settings?.seePublicRecipes}
                                 onChange={updateSetting}
                             />
-                            <Checkbox
+                            <Form.Check
                                 name='sharePublicRecipes'
                                 label='Share your public recipes'
                                 checked={NewData.settings?.sharePublicRecipes}
@@ -666,7 +715,7 @@ const Account = () => {
                                         }
                                     )}
                                 </ThemeChooser>
-                                <Form.Button
+                                <FormButton
                                     onClick={() =>
                                         setModalShow((prev) => {
                                             return {
@@ -677,7 +726,7 @@ const Account = () => {
                                     }
                                 >
                                     Create
-                                </Form.Button>
+                                </FormButton>
                             </div>
                         </InputGroup>
 
@@ -1472,13 +1521,13 @@ const Account = () => {
                             'default_themes'
                         ) &&
                             NewData?.id != null && (
-                                <Form.Button
+                                <FormButton
                                     name='deleteTheme'
                                     style={{ marginTop: '7px' }}
                                     onClick={updateSetting}
                                 >
                                     Delete Theme
-                                </Form.Button>
+                                </FormButton>
                             )}
                     </Section>
 
@@ -1512,7 +1561,7 @@ const Account = () => {
                                 display: NewData?.id == null ? 'none' : '',
                             }}
                         >
-                            <Form.Button
+                            <FormButton
                                 style={{ marginLeft: '0' }}
                                 name='closeAccount'
                                 onClick={() =>
@@ -1522,7 +1571,7 @@ const Account = () => {
                                 }
                             >
                                 Close Account
-                            </Form.Button>
+                            </FormButton>
                         </InputGroup>
                     </Section>
                 </Sections>

@@ -1,10 +1,10 @@
 import { useContext, useState } from 'react'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
-import IsCrushedContext from '../../contexts/IsCrushedContext'
-import AccountContext from '../../contexts/AccountContext'
-import Pages from '../../components/Pages/Pages'
-import { Form } from 'react-bootstrap'
+import IsCrushedContext from '../../../contexts/IsCrushedContext'
+import AccountContext from '../../../contexts/AccountContext'
+import Pages from '../../../components/Pages/Pages'
+import Form from '../../../components/Forms/Form'
 
 const DivBody = styled(Pages.PageBody)`
     width: 80%;
