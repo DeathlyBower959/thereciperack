@@ -96,7 +96,7 @@ const NavigationBar = () => {
                         className='align-top'
                     />{' '}
                     <Navbar.Brand style={{ color: theme.foreground }}>
-                        Testing Proving Game
+                        The Recipe Rack
                     </Navbar.Brand>
                 </Link>
 
